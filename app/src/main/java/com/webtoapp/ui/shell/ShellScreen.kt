@@ -475,7 +475,7 @@ fun ShellScreen(
         val color = webPageThemeColor
         if (color != null) {
             val effectiveMode = if (isDarkTheme) config.webViewConfig.statusBarColorModeDark else config.webViewConfig.statusBarColorMode
-            if (effectiveMode == "WEB_PAGE") {
+            if (effectiveMode == "WEB_PAGE" && hideToolbar && config.webViewConfig.showStatusBarInFullscreen) {
                 try {
                     val parsedColor = android.graphics.Color.parseColor(color)
                     activity.window.statusBarColor = parsedColor
@@ -491,8 +491,13 @@ fun ShellScreen(
         }
     }
 
+    val effectiveMode = if (isDarkTheme) config.webViewConfig.statusBarColorModeDark else config.webViewConfig.statusBarColorMode
     val effectiveBgType = if (isDarkTheme) statusBarBackgroundTypeDark else statusBarBackgroundType
-    val effectiveBgColor = if (isDarkTheme) statusBarBackgroundColorDark else statusBarBackgroundColor
+    val effectiveBgColor = if (effectiveMode == "WEB_PAGE" && webPageThemeColor != null && hideToolbar && config.webViewConfig.showStatusBarInFullscreen) {
+        webPageThemeColor
+    } else {
+        if (isDarkTheme) statusBarBackgroundColorDark else statusBarBackgroundColor
+    }
     val effectiveBgImage = if (isDarkTheme) statusBarBackgroundImageDark else statusBarBackgroundImage
     val effectiveBgAlpha = if (isDarkTheme) statusBarBackgroundAlphaDark else statusBarBackgroundAlpha
     val showOverlay = (hideToolbar && config.webViewConfig.showStatusBarInFullscreen) ||
@@ -500,17 +505,17 @@ fun ShellScreen(
     if (showOverlay) {
         com.webtoapp.ui.components.StatusBarOverlay(
             show = true,
-            backgroundType = effectiveBgType,
+            backgroundType = if (effectiveMode == "WEB_PAGE") "COLOR" else effectiveBgType,
             backgroundColor = effectiveBgColor,
-            backgroundImagePath = effectiveBgImage,
-            alpha = effectiveBgAlpha,
+            backgroundImagePath = if (effectiveMode == "WEB_PAGE") null else effectiveBgImage,
+            alpha = if (effectiveMode == "WEB_PAGE") 1f else effectiveBgAlpha,
             heightDp = statusBarHeightDp,
             modifier = Modifier.align(Alignment.TopStart)
         )
 
         val view = activity.window.decorView
         val insetsController = androidx.core.view.WindowInsetsControllerCompat(activity.window, view)
-        val isLightOverlay = effectiveBgType == "COLOR" && effectiveBgColor != null && run {
+        val isLightOverlay = if (effectiveMode == "WEB_PAGE" && effectiveBgColor != null) {
             try {
                 val color = android.graphics.Color.parseColor(effectiveBgColor)
                 val luminance = (0.299 * android.graphics.Color.red(color) +
@@ -518,6 +523,16 @@ fun ShellScreen(
                         0.114 * android.graphics.Color.blue(color)) / 255.0
                 luminance > 0.5
             } catch (e: Exception) { false }
+        } else {
+            effectiveBgType == "COLOR" && effectiveBgColor != null && run {
+                try {
+                    val color = android.graphics.Color.parseColor(effectiveBgColor)
+                    val luminance = (0.299 * android.graphics.Color.red(color) +
+                            0.587 * android.graphics.Color.green(color) +
+                            0.114 * android.graphics.Color.blue(color)) / 255.0
+                    luminance > 0.5
+                } catch (e: Exception) { false }
+            }
         }
         insetsController.isAppearanceLightStatusBars = isLightOverlay
     }
