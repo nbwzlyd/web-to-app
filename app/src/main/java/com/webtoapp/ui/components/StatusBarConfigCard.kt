@@ -98,10 +98,15 @@ fun StatusBarConfigCard(
     ) {
         StatusBarPreviewBox(
             heightDp = currentHeightDp,
-            backgroundType = config.statusBarBackgroundType,
-            backgroundColor = config.statusBarColor,
-            backgroundImage = config.statusBarBackgroundImage,
-            alpha = config.statusBarBackgroundAlpha
+            backgroundType = if (config.statusBarColorMode == StatusBarColorMode.CUSTOM) config.statusBarBackgroundType else StatusBarBackgroundType.COLOR,
+            backgroundColor = when (config.statusBarColorMode) {
+                StatusBarColorMode.THEME -> null
+                StatusBarColorMode.TRANSPARENT -> "#00000000"
+                StatusBarColorMode.CUSTOM -> config.statusBarColor
+                StatusBarColorMode.WEB_PAGE -> null
+            },
+            backgroundImage = if (config.statusBarColorMode == StatusBarColorMode.CUSTOM) config.statusBarBackgroundImage else null,
+            alpha = if (config.statusBarColorMode == StatusBarColorMode.CUSTOM) config.statusBarBackgroundAlpha else 1f
         )
 
         HeightSlider(
@@ -112,43 +117,100 @@ fun StatusBarConfigCard(
 
         HorizontalDivider()
 
-        Text(Strings.backgroundType, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(Strings.colorMode, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            PremiumFilterChip(
-                selected = config.statusBarBackgroundType == StatusBarBackgroundType.COLOR,
-                onClick = { onConfigChange(config.copy(statusBarBackgroundType = StatusBarBackgroundType.COLOR)) },
-                label = { Text(Strings.solidColor) },
-                leadingIcon = if (config.statusBarBackgroundType == StatusBarBackgroundType.COLOR) {
+            FilterChip(
+                selected = config.statusBarColorMode == StatusBarColorMode.THEME,
+                onClick = { onConfigChange(config.copy(statusBarColorMode = StatusBarColorMode.THEME)) },
+                label = { Text(Strings.followSystem) },
+                leadingIcon = if (config.statusBarColorMode == StatusBarColorMode.THEME) {
+                    { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) }
+                } else { { Icon(Icons.Outlined.AutoAwesome, null, Modifier.size(18.dp)) } }
+            )
+            FilterChip(
+                selected = config.statusBarColorMode == StatusBarColorMode.TRANSPARENT,
+                onClick = { onConfigChange(config.copy(statusBarColorMode = StatusBarColorMode.TRANSPARENT)) },
+                label = { Text(Strings.transparent) },
+                leadingIcon = if (config.statusBarColorMode == StatusBarColorMode.TRANSPARENT) {
+                    { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) }
+                } else { { Icon(Icons.Outlined.BlurOn, null, Modifier.size(18.dp)) } }
+            )
+        }
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(
+                selected = config.statusBarColorMode == StatusBarColorMode.CUSTOM,
+                onClick = {
+                    onConfigChange(config.copy(
+                        statusBarColorMode = StatusBarColorMode.CUSTOM,
+                        statusBarBackgroundType = StatusBarBackgroundType.COLOR
+                    ))
+                },
+                label = { Text(Strings.custom) },
+                leadingIcon = if (config.statusBarColorMode == StatusBarColorMode.CUSTOM) {
                     { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) }
                 } else { { Icon(Icons.Outlined.Palette, null, Modifier.size(18.dp)) } }
             )
-            PremiumFilterChip(
-                selected = config.statusBarBackgroundType == StatusBarBackgroundType.IMAGE,
-                onClick = { onConfigChange(config.copy(statusBarBackgroundType = StatusBarBackgroundType.IMAGE)) },
-                label = { Text(Strings.image) },
-                leadingIcon = if (config.statusBarBackgroundType == StatusBarBackgroundType.IMAGE) {
+            FilterChip(
+                selected = config.statusBarColorMode == StatusBarColorMode.WEB_PAGE,
+                onClick = { onConfigChange(config.copy(statusBarColorMode = StatusBarColorMode.WEB_PAGE)) },
+                label = { Text(Strings.statusBarColorModeWebPage) },
+                leadingIcon = if (config.statusBarColorMode == StatusBarColorMode.WEB_PAGE) {
                     { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) }
-                } else { { Icon(Icons.Outlined.Image, null, Modifier.size(18.dp)) } }
+                } else { { Icon(Icons.Outlined.Language, null, Modifier.size(18.dp)) } }
             )
         }
 
-        when (config.statusBarBackgroundType) {
-            StatusBarBackgroundType.COLOR -> {
-                ColorSelectionRow(currentColor = config.statusBarColor, onColorClick = { showColorPicker = true })
-            }
-            StatusBarBackgroundType.IMAGE -> {
-                ImageSelectionRow(
-                    currentImagePath = config.statusBarBackgroundImage,
-                    onSelectImage = { imagePickerLauncher.launch("image/*") },
-                    onClearImage = { onConfigChange(config.copy(statusBarBackgroundImage = null, statusBarBackgroundType = StatusBarBackgroundType.COLOR)) }
-                )
-            }
+        if (config.statusBarColorMode == StatusBarColorMode.WEB_PAGE) {
+            Text(
+                Strings.statusBarColorModeWebPageHint,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
-        HorizontalDivider()
+        if (config.statusBarColorMode == StatusBarColorMode.CUSTOM) {
+            HorizontalDivider()
 
-        AlphaSlider(alpha = config.statusBarBackgroundAlpha, onAlphaChange = { onConfigChange(config.copy(statusBarBackgroundAlpha = it)) })
+            Text(Strings.backgroundType, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PremiumFilterChip(
+                    selected = config.statusBarBackgroundType == StatusBarBackgroundType.COLOR,
+                    onClick = { onConfigChange(config.copy(statusBarBackgroundType = StatusBarBackgroundType.COLOR)) },
+                    label = { Text(Strings.solidColor) },
+                    leadingIcon = if (config.statusBarBackgroundType == StatusBarBackgroundType.COLOR) {
+                        { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) }
+                    } else { { Icon(Icons.Outlined.Palette, null, Modifier.size(18.dp)) } }
+                )
+                PremiumFilterChip(
+                    selected = config.statusBarBackgroundType == StatusBarBackgroundType.IMAGE,
+                    onClick = { onConfigChange(config.copy(statusBarBackgroundType = StatusBarBackgroundType.IMAGE)) },
+                    label = { Text(Strings.image) },
+                    leadingIcon = if (config.statusBarBackgroundType == StatusBarBackgroundType.IMAGE) {
+                        { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) }
+                    } else { { Icon(Icons.Outlined.Image, null, Modifier.size(18.dp)) } }
+                )
+            }
+
+            when (config.statusBarBackgroundType) {
+                StatusBarBackgroundType.COLOR -> {
+                    ColorSelectionRow(currentColor = config.statusBarColor, onColorClick = { showColorPicker = true })
+                }
+                StatusBarBackgroundType.IMAGE -> {
+                    ImageSelectionRow(
+                        currentImagePath = config.statusBarBackgroundImage,
+                        onSelectImage = { imagePickerLauncher.launch("image/*") },
+                        onClearImage = { onConfigChange(config.copy(statusBarBackgroundImage = null, statusBarBackgroundType = StatusBarBackgroundType.COLOR)) }
+                    )
+                }
+            }
+
+            HorizontalDivider()
+
+            AlphaSlider(alpha = config.statusBarBackgroundAlpha, onAlphaChange = { onConfigChange(config.copy(statusBarBackgroundAlpha = it)) })
+        }
     }
 }
 @Composable

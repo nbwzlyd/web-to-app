@@ -41,6 +41,27 @@ object WindowHelper {
                 val useDarkIcons = darkIcons ?: isColorLight(color)
                 controller.isAppearanceLightStatusBars = useDarkIcons
             }
+            "WEB_PAGE" -> {
+                if (customColor != null) {
+                    val color = try {
+                        android.graphics.Color.parseColor(customColor)
+                    } catch (e: Exception) {
+                        if (isDarkTheme) android.graphics.Color.parseColor("#1C1B1F")
+                        else android.graphics.Color.parseColor("#FFFBFE")
+                    }
+                    activity.window.statusBarColor = color
+                    val useDarkIcons = darkIcons ?: isColorLight(color)
+                    controller.isAppearanceLightStatusBars = useDarkIcons
+                } else {
+                    if (isDarkTheme) {
+                        activity.window.statusBarColor = android.graphics.Color.parseColor("#1C1B1F")
+                        controller.isAppearanceLightStatusBars = false
+                    } else {
+                        activity.window.statusBarColor = android.graphics.Color.parseColor("#FFFBFE")
+                        controller.isAppearanceLightStatusBars = true
+                    }
+                }
+            }
             else -> {
                 if (isDarkTheme) {
                     activity.window.statusBarColor = android.graphics.Color.parseColor("#1C1B1F")
@@ -120,6 +141,27 @@ object WindowHelper {
                                     activity.window.statusBarColor = android.graphics.Color.TRANSPARENT
                                     val useDarkIcons = statusBarDarkIcons ?: !isDarkTheme
                                     controller.isAppearanceLightStatusBars = useDarkIcons
+                                }
+                                "WEB_PAGE" -> {
+                                    if (statusBarCustomColor != null) {
+                                        val color = try {
+                                            android.graphics.Color.parseColor(statusBarCustomColor)
+                                        } catch (e: Exception) {
+                                            if (isDarkTheme) android.graphics.Color.parseColor("#1C1B1F")
+                                            else android.graphics.Color.parseColor("#FFFBFE")
+                                        }
+                                        activity.window.statusBarColor = color
+                                        val useDarkIcons = statusBarDarkIcons ?: isColorLight(color)
+                                        controller.isAppearanceLightStatusBars = useDarkIcons
+                                    } else {
+                                        if (isDarkTheme) {
+                                            activity.window.statusBarColor = android.graphics.Color.parseColor("#1C1B1F")
+                                            controller.isAppearanceLightStatusBars = false
+                                        } else {
+                                            activity.window.statusBarColor = android.graphics.Color.parseColor("#FFFBFE")
+                                            controller.isAppearanceLightStatusBars = true
+                                        }
+                                    }
                                 }
                                 else -> {
                                     if (isDarkTheme) {

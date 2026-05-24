@@ -162,7 +162,8 @@ data class Announcement(
 enum class StatusBarColorMode {
     THEME,
     TRANSPARENT,
-    CUSTOM
+    CUSTOM,
+    WEB_PAGE
 }
 
 enum class StatusBarBackgroundType {

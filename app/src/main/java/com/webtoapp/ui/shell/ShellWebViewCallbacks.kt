@@ -9,6 +9,7 @@ import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.widget.Toast
+import androidx.core.view.WindowInsetsControllerCompat
 import com.webtoapp.core.logging.AppLogger
 import com.webtoapp.core.i18n.Strings
 import com.webtoapp.core.shell.ShellConfig
@@ -43,7 +44,8 @@ fun createShellWebViewCallbacks(
     updateNavigation: (canBack: Boolean, canForward: Boolean) -> Unit,
     updateWebViewRef: (WebView?) -> Unit,
     notifyRecreationKeyIncrement: () -> Unit,
-    notifyLongPressMenu: (LongPressHandler.LongPressResult, Float, Float) -> Unit
+    notifyLongPressMenu: (LongPressHandler.LongPressResult, Float, Float) -> Unit,
+    onWebPageThemeColor: ((String) -> Unit)? = null
 ): WebViewCallbacks {
     return object : WebViewCallbacks {
         override fun onPageStarted(url: String?) {
@@ -80,6 +82,23 @@ fun createShellWebViewCallbacks(
                     longPressHandler.injectLongPressEnhancer(it)
                 } else {
                     AppLogger.d("ShellActivity", "Skip Shell onPageFinished enhancements for local runtime page: $url")
+                }
+
+
+                val isWebPageMode = config.webViewConfig.statusBarColorMode == "WEB_PAGE" ||
+                    config.webViewConfig.statusBarColorModeDark == "WEB_PAGE"
+                if (!isLocalRuntimePage && isWebPageMode) {
+                    it.evaluateJavascript("""
+                        (function() {
+                            var meta = document.querySelector('meta[name="theme-color"]');
+                            return meta ? meta.getAttribute('content') : '';
+                        })()
+                    """.trimIndent()) { result ->
+                        if (!result.isNullOrBlank() && result != "null" && result.length > 2) {
+                            val color = result.substring(1, result.length - 1)
+                            onWebPageThemeColor?.invoke(color)
+                        }
+                    }
                 }
 
 

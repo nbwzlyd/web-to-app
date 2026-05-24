@@ -10308,6 +10308,24 @@ object Strings {
         AppLanguage.ARABIC -> "لون شريط الحالة يتبع السمة: الافتراضي يتبع لون السمة"
     }
 
+    val statusBarColorModeWebPage: String get() = when (lang) {
+        AppLanguage.CHINESE -> "跟随网页颜色"
+        AppLanguage.ENGLISH -> "Follow Web Page"
+        AppLanguage.ARABIC -> "اتبع لون صفحة الويب"
+    }
+
+    val statusBarColorModeWebPageHint: String get() = when (lang) {
+        AppLanguage.CHINESE -> "自动从网页的 theme-color 元标签获取颜色"
+        AppLanguage.ENGLISH -> "Automatically reads the page's theme-color meta tag"
+        AppLanguage.ARABIC -> "يقرأ تلقائيًا علامة meta الخاصة بلون السمة من الصفحة"
+    }
+
+    val colorMode: String get() = when (lang) {
+        AppLanguage.CHINESE -> "颜色模式"
+        AppLanguage.ENGLISH -> "Color Mode"
+        AppLanguage.ARABIC -> "وضع الألوان"
+    }
+
     val customStatusBarBgColor: String get() = when (lang) {
         AppLanguage.CHINESE -> "支持自定义状态栏背景颜色"
         AppLanguage.ENGLISH -> "Support custom status bar background color"

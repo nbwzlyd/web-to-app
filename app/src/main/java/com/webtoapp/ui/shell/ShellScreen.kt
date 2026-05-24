@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.webtoapp.WebToAppApplication
@@ -292,6 +293,7 @@ fun ShellScreen(
 
     val bgmState = rememberBgmPlayerState(context, config)
 
+    var webPageThemeColor by remember { mutableStateOf<String?>(null) }
 
     val webViewCallbacks = remember {
         createShellWebViewCallbacks(
@@ -316,7 +318,8 @@ fun ShellScreen(
                 longPressTouchX = x
                 longPressTouchY = y
                 showLongPressMenu = true
-            }
+            },
+            onWebPageThemeColor = { color -> webPageThemeColor = color }
         )
     }
 
@@ -467,6 +470,27 @@ fun ShellScreen(
 
 
     val isDarkTheme = com.webtoapp.ui.theme.LocalIsDarkTheme.current
+
+    LaunchedEffect(webPageThemeColor) {
+        val color = webPageThemeColor
+        if (color != null) {
+            val effectiveMode = if (isDarkTheme) config.webViewConfig.statusBarColorModeDark else config.webViewConfig.statusBarColorMode
+            if (effectiveMode == "WEB_PAGE") {
+                try {
+                    val parsedColor = android.graphics.Color.parseColor(color)
+                    activity.window.statusBarColor = parsedColor
+                    val luminance = (0.299 * android.graphics.Color.red(parsedColor) +
+                        0.587 * android.graphics.Color.green(parsedColor) +
+                        0.114 * android.graphics.Color.blue(parsedColor)) / 255.0
+                    val controller = WindowInsetsControllerCompat(activity.window, activity.window.decorView)
+                    controller.isAppearanceLightStatusBars = luminance > 0.5
+                } catch (e: Exception) {
+                    AppLogger.w("ShellScreen", "Failed to apply webpage theme color: $color", e)
+                }
+            }
+        }
+    }
+
     val effectiveBgType = if (isDarkTheme) statusBarBackgroundTypeDark else statusBarBackgroundType
     val effectiveBgColor = if (isDarkTheme) statusBarBackgroundColorDark else statusBarBackgroundColor
     val effectiveBgImage = if (isDarkTheme) statusBarBackgroundImageDark else statusBarBackgroundImage
