@@ -76,7 +76,6 @@ import com.webtoapp.ui.animation.AnimatedAlertDialog
 import com.webtoapp.ui.viewmodel.MainViewModel
 import com.webtoapp.ui.viewmodel.UiState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -486,18 +485,25 @@ fun HomeScreen(
                         if (stale.isNotEmpty()) {
                             stale.forEach { previewSpecs.remove(it) }
                         }
-                        val missingIds = apps.mapNotNull { summary ->
-                            summary.id.takeIf { it !in previewSpecs }
+                        val missing = apps.filter { it.id !in previewSpecs }
+                        if (missing.isEmpty()) {
+                            return@LaunchedEffect
                         }
-                        if (missingIds.isEmpty()) {
+                        missing.forEach { summary ->
+                            resolveAppPreviewSpecFromSummary(summary)?.let { spec ->
+                                previewSpecs[summary.id] = spec
+                            }
+                        }
+                        val needFullLoad = missing.filter { it.id !in previewSpecs }
+                        if (needFullLoad.isEmpty()) {
                             return@LaunchedEffect
                         }
                         withContext(Dispatchers.IO) {
-                            for (id in missingIds) {
-                                val webApp = viewModel.getWebApp(id) ?: continue
+                            for (summary in needFullLoad) {
+                                val webApp = viewModel.getWebApp(summary.id) ?: continue
                                 val spec = resolveAppPreviewSpec(listContext.applicationContext, webApp)
                                 withContext(Dispatchers.Main) {
-                                    previewSpecs[id] = spec
+                                    previewSpecs[summary.id] = spec
                                 }
                             }
                         }
@@ -505,11 +511,12 @@ fun HomeScreen(
 
                     val latestApps = rememberUpdatedState(apps)
                     val latestPreviewSpecs = rememberUpdatedState(previewSpecs.toMap())
-                    val captureSignature = remember(previewSpecs.toMap()) {
-                        previewSpecs.entries
-                            .mapNotNull { (id, spec) -> spec.captureUrl?.let { "$id:$it" } }
-                            .sorted()
-                            .joinToString("|")
+                    val captureSignature = remember(apps, previewSpecs.toMap()) {
+                        apps.mapNotNull { app ->
+                            val captureUrl = resolveAppPreviewSpecFromSummary(app)?.captureUrl
+                                ?: previewSpecs[app.id]?.captureUrl
+                            captureUrl?.let { url -> "${app.id}:$url" }
+                        }.sorted().joinToString("|")
                     }
 
                     LaunchedEffect(screenshotService, captureSignature) {
@@ -524,12 +531,12 @@ fun HomeScreen(
                             return@LaunchedEffect
                         }
 
-                        delay(500)
-
                         val appsNow = latestApps.value
                         val specsNow = latestPreviewSpecs.value
                         val captureTargets = appsNow.mapNotNull { app ->
-                            specsNow[app.id]?.captureUrl?.let { captureUrl -> app to captureUrl }
+                            val captureUrl = resolveAppPreviewSpecFromSummary(app)?.captureUrl
+                                ?: specsNow[app.id]?.captureUrl
+                            captureUrl?.let { url -> app to url }
                         }
                         com.webtoapp.core.logging.AppLogger.i(
                             "ScreenshotFlow",

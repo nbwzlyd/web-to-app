@@ -7,6 +7,7 @@ import com.webtoapp.core.nodejs.NodeRuntime
 import com.webtoapp.core.php.PhpAppRuntime
 import com.webtoapp.core.python.PythonRuntime
 import com.webtoapp.core.wordpress.WordPressManager
+import com.webtoapp.data.dao.WebAppSummary
 import com.webtoapp.data.model.AppType
 import com.webtoapp.data.model.WebApp
 import java.io.File
@@ -15,6 +16,25 @@ internal data class AppPreviewSpec(
     val previewFilePath: String? = null,
     val captureUrl: String? = null
 )
+
+/**
+ * Fast preview resolution from list summary fields — avoids loading full [WebApp] from Room.
+ * Returns null when the app type needs full config (HTML, Node.js, gallery, etc.).
+ */
+internal fun resolveAppPreviewSpecFromSummary(summary: WebAppSummary): AppPreviewSpec? {
+    return when (summary.appType) {
+        AppType.WEB -> AppPreviewSpec(
+            captureUrl = summary.url.takeIf { it.startsWith("http", ignoreCase = true) }
+        )
+        AppType.MULTI_WEB -> AppPreviewSpec(
+            captureUrl = summary.url.takeIf { it.startsWith("http", ignoreCase = true) }
+        )
+        AppType.IMAGE, AppType.VIDEO -> {
+            existingFile(summary.url)?.absolutePath?.let { AppPreviewSpec(previewFilePath = it) }
+        }
+        else -> null
+    }
+}
 
 internal fun resolveAppPreviewSpec(context: Context, app: WebApp): AppPreviewSpec {
     return when (app.appType) {

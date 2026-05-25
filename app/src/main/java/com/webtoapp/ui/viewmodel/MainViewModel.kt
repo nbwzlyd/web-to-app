@@ -82,6 +82,11 @@ class MainViewModel(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
+    /** Blank query emits immediately for first paint; debounce only while searching. */
+    private val searchQueryForFilter: Flow<String> = _searchQuery.flatMapLatest { query ->
+        if (query.isBlank()) flowOf(query) else flowOf(query).debounce(300)
+    }
+
 
     private val _pwaAnalysisState = MutableStateFlow<PwaAnalysisState>(PwaAnalysisState.Idle)
     val pwaAnalysisState: StateFlow<PwaAnalysisState> = _pwaAnalysisState.asStateFlow()
@@ -100,7 +105,7 @@ class MainViewModel(
 
     val filteredApps: StateFlow<List<WebApp>> = combine(
         webApps,
-        searchQuery.debounce(300),
+        searchQueryForFilter,
         selectedCategoryId
     ) { apps, query, categoryId ->
         var filtered = apps
@@ -126,7 +131,7 @@ class MainViewModel(
 
     val filteredSummaries: StateFlow<List<WebAppSummary>> = combine(
         webAppSummaries,
-        searchQuery.debounce(300),
+        searchQueryForFilter,
         selectedCategoryId
     ) { summaries, query, categoryId ->
         var filtered = summaries
