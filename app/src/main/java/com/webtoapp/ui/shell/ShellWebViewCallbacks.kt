@@ -52,6 +52,7 @@ fun createShellWebViewCallbacks(
     return object : WebViewCallbacks {
         override fun onPageStarted(url: String?) {
             if (url == "about:blank") return
+            updateProgress(0)
             updateLoading(true)
             updateUrl(url ?: "")
             if (!isLocalRuntimeShellUrl(url) && config.shouldInstallWebPageColorBridge()) {

@@ -1941,6 +1941,7 @@ fun WebViewScreen(
 
 
                 if (url == "about:blank") return
+                loadProgress = 0
                 isLoading = true
                 currentUrl = url ?: ""
                 jsScrollTop.set(0)
@@ -2610,18 +2611,6 @@ fun WebViewScreen(
 
         Box(modifier = contentModifier) {
 
-            AnimatedVisibility(
-                visible = isLoading,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                LinearProgressIndicator(
-                    progress = { loadProgress / 100f },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-
             if (!isActivationChecked && webApp?.activationEnabled == true) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -3001,6 +2990,12 @@ fun WebViewScreen(
                 }
             }
 
+
+            com.webtoapp.ui.components.WebViewLoadingBar(
+                visible = isLoading,
+                progress = loadProgress / 100f,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
 
         }
     }

@@ -15,9 +15,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import com.webtoapp.ui.components.WebViewLoadingBar
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.webtoapp.core.i18n.Strings
@@ -133,19 +132,6 @@ fun BoxScope.ShellScaffoldLayout(
 
         Box(modifier = contentModifier) {
 
-            // Thin Safari-style top progress. Sits flush at the top of the
-            // content area, grows with the page load, then fades out once
-            // loading finishes rather than abruptly disappearing.
-            WebViewLoadingBar(
-                visible = isLoading,
-                progress = loadProgress / 100f,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-            )
-
-
-
             ShellContentArea(
                 config = config,
                 appType = appType,
@@ -199,6 +185,12 @@ fun BoxScope.ShellScaffoldLayout(
                 config = config,
                 forcedRunActive = forcedRunActive,
                 webViewRef = webViewRef
+            )
+
+            WebViewLoadingBar(
+                visible = isLoading,
+                progress = loadProgress / 100f,
+                modifier = Modifier.align(Alignment.TopCenter)
             )
         }
     }
@@ -378,48 +370,3 @@ private fun ShellContentArea(
 }
 
 
-/**
- * Safari-style thin loading indicator.
- *
- * Behaviour:
- *  - Animates from 0 to the latest reported `progress` with the settle spring
- *    so the fill always feels physical rather than snapping.
- *  - When visibility flips off, the bar first finishes to full, then fades
- *    over ~240ms. This avoids the "bar disappears halfway" feel of the raw
- *    LinearProgressIndicator that was previously used.
- *  - Height is 2dp, no trailing track (we draw only the fill), so it reads as
- *    a restrained affordance rather than a loud control.
- */
-@Composable
-private fun WebViewLoadingBar(
-    visible: Boolean,
-    progress: Float,
-    modifier: Modifier = Modifier
-) {
-    val animatedProgress by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = if (visible) progress.coerceIn(0f, 1f) else 1f,
-        animationSpec = com.webtoapp.ui.design.WtaMotion.settleSpring(),
-        label = "webviewProgress"
-    )
-    val alpha by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = com.webtoapp.ui.design.WtaMotion.exitTween(
-            durationMillis = com.webtoapp.ui.design.WtaMotion.DurationMedium
-        ),
-        label = "webviewProgressAlpha"
-    )
-    if (alpha <= 0f) return
-
-    val primary = MaterialTheme.colorScheme.primary
-    androidx.compose.foundation.Canvas(
-        modifier = modifier
-            .height(2.dp)
-            .graphicsLayer { this.alpha = alpha }
-    ) {
-        val fillWidth = size.width * animatedProgress
-        drawRect(
-            color = primary,
-            size = Size(fillWidth, size.height)
-        )
-    }
-}
