@@ -1070,8 +1070,11 @@ class ApkBuilder(private val context: Context) {
                 }
 
 
-                if (config.statusBarBackgroundType == "IMAGE" && !config.statusBarBackgroundImage.isNullOrEmpty()) {
-                    addStatusBarBackgroundToAssets(zipOut, config.statusBarBackgroundImage)
+                if (config.statusBarBackgroundType == "IMAGE") {
+                    val statusBarBg = config.statusBarBackgroundImage
+                    if (!statusBarBg.isNullOrEmpty()) {
+                        addStatusBarBackgroundToAssets(zipOut, statusBarBg)
+                    }
                 }
 
 
@@ -3251,13 +3254,11 @@ fun WebApp.toApkConfig(packageName: String, context: android.content.Context? = 
         else -> url
     }
 
-    return ApkConfig(
-        appName = name,
-        packageName = packageName,
-        targetUrl = effectiveTargetUrl,
-        versionCode = apkExportConfig?.customVersionCode ?: 1,
-        versionName = apkExportConfig?.customVersionName?.takeIf { it.isNotBlank() } ?: "1.0.0",
-        iconPath = iconPath,
+    return ApkConfig(name, packageName, effectiveTargetUrl).apply {
+        val webApp = this@toApkConfig
+        versionCode = apkExportConfig?.customVersionCode ?: 1
+        versionName = apkExportConfig?.customVersionName?.takeIf { it.isNotBlank() } ?: "1.0.0"
+        iconPath = webApp.iconPath
         runtimePermissions = (apkExportConfig?.runtimePermissions ?: ApkRuntimePermissions()).let { rp ->
             var result = rp
 
@@ -3298,58 +3299,58 @@ fun WebApp.toApkConfig(packageName: String, context: android.content.Context? = 
             }
 
             result
-        },
-        networkTrustConfig = apkExportConfig?.networkTrustConfig ?: com.webtoapp.data.model.NetworkTrustConfig(),
-        activationEnabled = activationEnabled,
-        activationCodes = getActivationCodeStrings(),
-        activationRequireEveryTime = activationRequireEveryTime,
-        activationDialogTitle = activationDialogConfig?.title ?: "",
-        activationDialogSubtitle = activationDialogConfig?.subtitle ?: "",
-        activationDialogInputLabel = activationDialogConfig?.inputLabel ?: "",
-        activationDialogButtonText = activationDialogConfig?.buttonText ?: "",
-        adBlockEnabled = adBlockEnabled,
-        adBlockRules = adBlockRules,
-        announcementEnabled = announcementEnabled,
-        announcementTitle = announcement?.title ?: "",
-        announcementContent = announcement?.content ?: "",
-        announcementLink = announcement?.linkUrl ?: "",
-        announcementLinkText = announcement?.linkText ?: "",
-        announcementTemplate = announcement?.template?.toUiTemplate()?.type?.name ?: AnnouncementTemplateType.MINIMAL.name,
-        announcementShowEmoji = announcement?.showEmoji ?: true,
-        announcementAnimationEnabled = announcement?.animationEnabled ?: true,
-        announcementShowOnce = announcement?.showOnce ?: true,
-        announcementRequireConfirmation = announcement?.requireConfirmation ?: false,
-        announcementAllowNeverShow = announcement?.allowNeverShow ?: false,
-        announcementTriggerOnLaunch = announcement?.triggerOnLaunch ?: true,
-        announcementTriggerOnNoNetwork = announcement?.triggerOnNoNetwork ?: false,
-        announcementTriggerIntervalMinutes = announcement?.triggerIntervalMinutes ?: 0,
+        }
+        networkTrustConfig = apkExportConfig?.networkTrustConfig ?: com.webtoapp.data.model.NetworkTrustConfig()
+        activationEnabled = webApp.activationEnabled
+        activationCodes = getActivationCodeStrings()
+        activationRequireEveryTime = webApp.activationRequireEveryTime
+        activationDialogTitle = activationDialogConfig?.title ?: ""
+        activationDialogSubtitle = activationDialogConfig?.subtitle ?: ""
+        activationDialogInputLabel = activationDialogConfig?.inputLabel ?: ""
+        activationDialogButtonText = activationDialogConfig?.buttonText ?: ""
+        adBlockEnabled = webApp.adBlockEnabled
+        adBlockRules = webApp.adBlockRules
+        announcementEnabled = webApp.announcementEnabled
+        announcementTitle = announcement?.title ?: ""
+        announcementContent = announcement?.content ?: ""
+        announcementLink = announcement?.linkUrl ?: ""
+        announcementLinkText = announcement?.linkText ?: ""
+        announcementTemplate = announcement?.template?.toUiTemplate()?.type?.name ?: AnnouncementTemplateType.MINIMAL.name
+        announcementShowEmoji = announcement?.showEmoji ?: true
+        announcementAnimationEnabled = announcement?.animationEnabled ?: true
+        announcementShowOnce = announcement?.showOnce ?: true
+        announcementRequireConfirmation = announcement?.requireConfirmation ?: false
+        announcementAllowNeverShow = announcement?.allowNeverShow ?: false
+        announcementTriggerOnLaunch = announcement?.triggerOnLaunch ?: true
+        announcementTriggerOnNoNetwork = announcement?.triggerOnNoNetwork ?: false
+        announcementTriggerIntervalMinutes = announcement?.triggerIntervalMinutes ?: 0
 
-        adsEnabled = adsEnabled,
-        adBannerEnabled = adConfig?.bannerEnabled ?: false,
-        adBannerId = adConfig?.bannerId ?: "",
-        adInterstitialEnabled = adConfig?.interstitialEnabled ?: false,
-        adInterstitialId = adConfig?.interstitialId ?: "",
-        adSplashEnabled = adConfig?.splashEnabled ?: false,
-        adSplashId = adConfig?.splashId ?: "",
-        javaScriptEnabled = webViewConfig.javaScriptEnabled,
-        domStorageEnabled = webViewConfig.domStorageEnabled,
-        allowFileAccess = webViewConfig.allowFileAccess,
-        allowContentAccess = webViewConfig.allowContentAccess,
-        cacheEnabled = webViewConfig.cacheEnabled,
-        zoomEnabled = webViewConfig.zoomEnabled,
-        desktopMode = webViewConfig.desktopMode,
-        userAgent = webViewConfig.userAgent,
-        userAgentMode = webViewConfig.userAgentMode.name,
-        customUserAgent = webViewConfig.customUserAgent,
+        adsEnabled = webApp.adsEnabled
+        adBannerEnabled = adConfig?.bannerEnabled ?: false
+        adBannerId = adConfig?.bannerId ?: ""
+        adInterstitialEnabled = adConfig?.interstitialEnabled ?: false
+        adInterstitialId = adConfig?.interstitialId ?: ""
+        adSplashEnabled = adConfig?.splashEnabled ?: false
+        adSplashId = adConfig?.splashId ?: ""
+        javaScriptEnabled = webViewConfig.javaScriptEnabled
+        domStorageEnabled = webViewConfig.domStorageEnabled
+        allowFileAccess = webViewConfig.allowFileAccess
+        allowContentAccess = webViewConfig.allowContentAccess
+        cacheEnabled = webViewConfig.cacheEnabled
+        zoomEnabled = webViewConfig.zoomEnabled
+        desktopMode = webViewConfig.desktopMode
+        userAgent = webViewConfig.userAgent
+        userAgentMode = webViewConfig.userAgentMode.name
+        customUserAgent = webViewConfig.customUserAgent
 
 
-        hideToolbar = webViewConfig.hideToolbar,
-        hideBrowserToolbar = webViewConfig.hideBrowserToolbar,
-        showStatusBarInFullscreen = webViewConfig.showStatusBarInFullscreen,
-        showNavigationBarInFullscreen = webViewConfig.showNavigationBarInFullscreen,
-        showToolbarInFullscreen = webViewConfig.showToolbarInFullscreen,
-        landscapeMode = webViewConfig.landscapeMode,
-        orientationMode = webViewConfig.orientationMode.name,
+        hideToolbar = webViewConfig.hideToolbar
+        hideBrowserToolbar = webViewConfig.hideBrowserToolbar
+        showStatusBarInFullscreen = webViewConfig.showStatusBarInFullscreen
+        showNavigationBarInFullscreen = webViewConfig.showNavigationBarInFullscreen
+        showToolbarInFullscreen = webViewConfig.showToolbarInFullscreen
+        landscapeMode = webViewConfig.landscapeMode
+        orientationMode = webViewConfig.orientationMode.name
 
 
 
@@ -3384,141 +3385,141 @@ fun WebApp.toApkConfig(packageName: String, context: android.content.Context? = 
                 webViewConfig.injectScripts
             }
             addAll(resolvedScripts)
-        },
+        }
 
-        statusBarColorMode = webViewConfig.statusBarColorMode.name,
-        statusBarColor = webViewConfig.statusBarColor,
-        statusBarDarkIcons = webViewConfig.statusBarDarkIcons,
-        statusBarBackgroundType = webViewConfig.statusBarBackgroundType.name,
-        statusBarBackgroundImage = webViewConfig.statusBarBackgroundImage,
-        statusBarBackgroundAlpha = webViewConfig.statusBarBackgroundAlpha,
-        statusBarHeightDp = webViewConfig.statusBarHeightDp,
+        statusBarColorMode = webViewConfig.statusBarColorMode.name
+        statusBarColor = webViewConfig.statusBarColor
+        statusBarDarkIcons = webViewConfig.statusBarDarkIcons
+        statusBarBackgroundType = webViewConfig.statusBarBackgroundType.name
+        statusBarBackgroundImage = webViewConfig.statusBarBackgroundImage
+        statusBarBackgroundAlpha = webViewConfig.statusBarBackgroundAlpha
+        statusBarHeightDp = webViewConfig.statusBarHeightDp
 
-        statusBarColorModeDark = webViewConfig.statusBarColorModeDark.name,
-        statusBarColorDark = webViewConfig.statusBarColorDark,
-        statusBarDarkIconsDark = webViewConfig.statusBarDarkIconsDark,
-        statusBarBackgroundTypeDark = webViewConfig.statusBarBackgroundTypeDark.name,
-        statusBarBackgroundImageDark = webViewConfig.statusBarBackgroundImageDark,
-        statusBarBackgroundAlphaDark = webViewConfig.statusBarBackgroundAlphaDark,
-        longPressMenuEnabled = webViewConfig.longPressMenuEnabled,
-        longPressMenuStyle = webViewConfig.longPressMenuStyle.name,
-        adBlockToggleEnabled = webViewConfig.adBlockToggleEnabled,
-        popupBlockerEnabled = webViewConfig.popupBlockerEnabled,
-        popupBlockerToggleEnabled = webViewConfig.popupBlockerToggleEnabled,
-        openExternalLinks = webViewConfig.openExternalLinks,
+        statusBarColorModeDark = webViewConfig.statusBarColorModeDark.name
+        statusBarColorDark = webViewConfig.statusBarColorDark
+        statusBarDarkIconsDark = webViewConfig.statusBarDarkIconsDark
+        statusBarBackgroundTypeDark = webViewConfig.statusBarBackgroundTypeDark.name
+        statusBarBackgroundImageDark = webViewConfig.statusBarBackgroundImageDark
+        statusBarBackgroundAlphaDark = webViewConfig.statusBarBackgroundAlphaDark
+        longPressMenuEnabled = webViewConfig.longPressMenuEnabled
+        longPressMenuStyle = webViewConfig.longPressMenuStyle.name
+        adBlockToggleEnabled = webViewConfig.adBlockToggleEnabled
+        popupBlockerEnabled = webViewConfig.popupBlockerEnabled
+        popupBlockerToggleEnabled = webViewConfig.popupBlockerToggleEnabled
+        openExternalLinks = webViewConfig.openExternalLinks
 
-        initialScale = webViewConfig.initialScale,
-        viewportMode = webViewConfig.viewportMode.name,
-        customViewportWidth = webViewConfig.customViewportWidth,
-        newWindowBehavior = webViewConfig.newWindowBehavior.name,
-        enablePaymentSchemes = webViewConfig.enablePaymentSchemes,
-        enableShareBridge = webViewConfig.enableShareBridge,
-        enableZoomPolyfill = webViewConfig.enableZoomPolyfill,
-        enableCrossOriginIsolation = webViewConfig.enableCrossOriginIsolation,
-        disableShields = webViewConfig.disableShields,
-        decodeBase64DeepLinks = webViewConfig.decodeBase64DeepLinks,
-        mediaAutoplayEnabled = webViewConfig.mediaAutoplayEnabled,
-        acceptThirdPartyCookies = webViewConfig.acceptThirdPartyCookies,
-        enableKernelDisguise = webViewConfig.enableKernelDisguise,
-        enableImageRepair = webViewConfig.enableImageRepair,
-        enableScrollMemory = webViewConfig.enableScrollMemory,
-        enableHttpsUpgrade = webViewConfig.enableHttpsUpgrade,
-        enableOAuthExternalRedirect = webViewConfig.enableOAuthExternalRedirect,
-        enableClipboardPolyfill = webViewConfig.enableClipboardPolyfill,
-        enableNotificationPolyfill = webViewConfig.enableNotificationPolyfill,
-        safeBrowsingEnabled = webViewConfig.safeBrowsingEnabled,
-        geolocationEnabled = webViewConfig.geolocationEnabled,
-        enableOrientationPolyfill = webViewConfig.enableOrientationPolyfill,
-        enableCompatPolyfills = webViewConfig.enableCompatPolyfills,
-        enableNativeBridge = webViewConfig.enableNativeBridge,
-        javaScriptCanOpenWindows = webViewConfig.javaScriptCanOpenWindows,
-        databaseEnabled = webViewConfig.databaseEnabled,
-        enableCookiePersistence = webViewConfig.enableCookiePersistence,
-        enablePrivateNetworkBridge = webViewConfig.enablePrivateNetworkBridge,
-        allowMixedContent = webViewConfig.allowMixedContent,
-        enableGpc = webViewConfig.enableGpc,
-        enableCookieConsentBlock = webViewConfig.enableCookieConsentBlock,
-        enableReferrerPolicy = webViewConfig.enableReferrerPolicy,
-        enableTrackerBlocking = webViewConfig.enableTrackerBlocking,
-        enableBlobDownloadInterception = webViewConfig.enableBlobDownloadInterception,
-        keepScreenOn = webViewConfig.keepScreenOn,
-        screenAwakeMode = webViewConfig.screenAwakeMode.name,
-        screenAwakeTimeoutMinutes = webViewConfig.screenAwakeTimeoutMinutes,
-        screenBrightness = webViewConfig.screenBrightness,
-        keyboardAdjustMode = webViewConfig.keyboardAdjustMode.name,
-        showFloatingBackButton = webViewConfig.showFloatingBackButton,
-        swipeRefreshEnabled = webViewConfig.swipeRefreshEnabled,
-        fullscreenEnabled = webViewConfig.fullscreenEnabled,
-        performanceOptimization = webViewConfig.performanceOptimization,
-        pwaOfflineEnabled = webViewConfig.pwaOfflineEnabled,
-        pwaOfflineStrategy = webViewConfig.pwaOfflineStrategy,
+        initialScale = webViewConfig.initialScale
+        viewportMode = webViewConfig.viewportMode.name
+        customViewportWidth = webViewConfig.customViewportWidth
+        newWindowBehavior = webViewConfig.newWindowBehavior.name
+        enablePaymentSchemes = webViewConfig.enablePaymentSchemes
+        enableShareBridge = webViewConfig.enableShareBridge
+        enableZoomPolyfill = webViewConfig.enableZoomPolyfill
+        enableCrossOriginIsolation = webViewConfig.enableCrossOriginIsolation
+        disableShields = webViewConfig.disableShields
+        decodeBase64DeepLinks = webViewConfig.decodeBase64DeepLinks
+        mediaAutoplayEnabled = webViewConfig.mediaAutoplayEnabled
+        acceptThirdPartyCookies = webViewConfig.acceptThirdPartyCookies
+        enableKernelDisguise = webViewConfig.enableKernelDisguise
+        enableImageRepair = webViewConfig.enableImageRepair
+        enableScrollMemory = webViewConfig.enableScrollMemory
+        enableHttpsUpgrade = webViewConfig.enableHttpsUpgrade
+        enableOAuthExternalRedirect = webViewConfig.enableOAuthExternalRedirect
+        enableClipboardPolyfill = webViewConfig.enableClipboardPolyfill
+        enableNotificationPolyfill = webViewConfig.enableNotificationPolyfill
+        safeBrowsingEnabled = webViewConfig.safeBrowsingEnabled
+        geolocationEnabled = webViewConfig.geolocationEnabled
+        enableOrientationPolyfill = webViewConfig.enableOrientationPolyfill
+        enableCompatPolyfills = webViewConfig.enableCompatPolyfills
+        enableNativeBridge = webViewConfig.enableNativeBridge
+        javaScriptCanOpenWindows = webViewConfig.javaScriptCanOpenWindows
+        databaseEnabled = webViewConfig.databaseEnabled
+        enableCookiePersistence = webViewConfig.enableCookiePersistence
+        enablePrivateNetworkBridge = webViewConfig.enablePrivateNetworkBridge
+        allowMixedContent = webViewConfig.allowMixedContent
+        enableGpc = webViewConfig.enableGpc
+        enableCookieConsentBlock = webViewConfig.enableCookieConsentBlock
+        enableReferrerPolicy = webViewConfig.enableReferrerPolicy
+        enableTrackerBlocking = webViewConfig.enableTrackerBlocking
+        enableBlobDownloadInterception = webViewConfig.enableBlobDownloadInterception
+        keepScreenOn = webViewConfig.keepScreenOn
+        screenAwakeMode = webViewConfig.screenAwakeMode.name
+        screenAwakeTimeoutMinutes = webViewConfig.screenAwakeTimeoutMinutes
+        screenBrightness = webViewConfig.screenBrightness
+        keyboardAdjustMode = webViewConfig.keyboardAdjustMode.name
+        showFloatingBackButton = webViewConfig.showFloatingBackButton
+        swipeRefreshEnabled = webViewConfig.swipeRefreshEnabled
+        fullscreenEnabled = webViewConfig.fullscreenEnabled
+        performanceOptimization = webViewConfig.performanceOptimization
+        pwaOfflineEnabled = webViewConfig.pwaOfflineEnabled
+        pwaOfflineStrategy = webViewConfig.pwaOfflineStrategy
 
-        proxyMode = webViewConfig.proxyMode,
-        proxyHost = webViewConfig.proxyHost,
-        proxyPort = webViewConfig.proxyPort,
-        proxyType = webViewConfig.proxyType,
-        pacUrl = webViewConfig.pacUrl,
-        proxyBypassRules = webViewConfig.proxyBypassRules,
-        proxyUsername = webViewConfig.proxyUsername,
-        proxyPassword = webViewConfig.proxyPassword,
-        hostsMappingEnabled = webViewConfig.hostsMappingEnabled,
-        hostsMappings = webViewConfig.hostsMappings,
+        proxyMode = webViewConfig.proxyMode
+        proxyHost = webViewConfig.proxyHost
+        proxyPort = webViewConfig.proxyPort
+        proxyType = webViewConfig.proxyType
+        pacUrl = webViewConfig.pacUrl
+        proxyBypassRules = webViewConfig.proxyBypassRules
+        proxyUsername = webViewConfig.proxyUsername
+        proxyPassword = webViewConfig.proxyPassword
+        hostsMappingEnabled = webViewConfig.hostsMappingEnabled
+        hostsMappings = webViewConfig.hostsMappings
 
-        dnsMode = webViewConfig.dnsMode,
+        dnsMode = webViewConfig.dnsMode
         dnsConfig = DnsApkConfig(
             provider = webViewConfig.dnsConfig.provider,
             customDohUrl = webViewConfig.dnsConfig.customDohUrl,
             dohMode = webViewConfig.dnsConfig.dohMode,
             bypassSystemDns = webViewConfig.dnsConfig.bypassSystemDns
-        ),
+        )
 
-        errorPageMode = webViewConfig.errorPageConfig.mode.name,
-        errorPageBuiltInStyle = webViewConfig.errorPageConfig.builtInStyle.name,
-        errorPageShowMiniGame = webViewConfig.errorPageConfig.showMiniGame,
-        errorPageMiniGameType = webViewConfig.errorPageConfig.miniGameType.name,
-        errorPageAutoRetrySeconds = webViewConfig.errorPageConfig.autoRetrySeconds,
-        errorPageCustomHtml = webViewConfig.errorPageConfig.customHtml ?: "",
-        errorPageCustomMediaPath = webViewConfig.errorPageConfig.customMediaPath ?: "",
-        errorPageRetryButtonText = webViewConfig.errorPageConfig.retryButtonText,
+        errorPageMode = webViewConfig.errorPageConfig.mode.name
+        errorPageBuiltInStyle = webViewConfig.errorPageConfig.builtInStyle.name
+        errorPageShowMiniGame = webViewConfig.errorPageConfig.showMiniGame
+        errorPageMiniGameType = webViewConfig.errorPageConfig.miniGameType.name
+        errorPageAutoRetrySeconds = webViewConfig.errorPageConfig.autoRetrySeconds
+        errorPageCustomHtml = webViewConfig.errorPageConfig.customHtml ?: ""
+        errorPageCustomMediaPath = webViewConfig.errorPageConfig.customMediaPath ?: ""
+        errorPageRetryButtonText = webViewConfig.errorPageConfig.retryButtonText
 
-        floatingWindowEnabled = webViewConfig.floatingWindowConfig.enabled,
-        floatingWindowSizePercent = webViewConfig.floatingWindowConfig.windowSizePercent,
-        floatingWindowWidthPercent = webViewConfig.floatingWindowConfig.widthPercent,
-        floatingWindowHeightPercent = webViewConfig.floatingWindowConfig.heightPercent,
-        floatingWindowLockAspectRatio = webViewConfig.floatingWindowConfig.lockAspectRatio,
-        floatingWindowOpacity = webViewConfig.floatingWindowConfig.opacity,
-        floatingWindowCornerRadius = webViewConfig.floatingWindowConfig.cornerRadius,
-        floatingWindowBorderStyle = webViewConfig.floatingWindowConfig.borderStyle.name,
-        floatingWindowShowTitleBar = webViewConfig.floatingWindowConfig.showTitleBar,
-        floatingWindowAutoHideTitleBar = webViewConfig.floatingWindowConfig.autoHideTitleBar,
-        floatingWindowStartMinimized = webViewConfig.floatingWindowConfig.startMinimized,
-        floatingWindowRememberPosition = webViewConfig.floatingWindowConfig.rememberPosition,
-        floatingWindowEdgeSnapping = webViewConfig.floatingWindowConfig.edgeSnapping,
-        floatingWindowShowResizeHandle = webViewConfig.floatingWindowConfig.showResizeHandle,
-        floatingWindowLockPosition = webViewConfig.floatingWindowConfig.lockPosition,
-        splashEnabled = splashEnabled,
-        splashType = splashConfig?.type?.name ?: "IMAGE",
-        splashDuration = splashConfig?.duration ?: 3,
-        splashClickToSkip = splashConfig?.clickToSkip ?: true,
-        splashVideoStartMs = splashConfig?.videoStartMs ?: 0L,
-        splashVideoEndMs = splashConfig?.videoEndMs ?: 5000L,
-        splashLandscape = splashConfig?.orientation == com.webtoapp.data.model.SplashOrientation.LANDSCAPE,
-        splashFillScreen = splashConfig?.fillScreen ?: true,
-        splashEnableAudio = splashConfig?.enableAudio ?: false,
+        floatingWindowEnabled = webViewConfig.floatingWindowConfig.enabled
+        floatingWindowSizePercent = webViewConfig.floatingWindowConfig.windowSizePercent
+        floatingWindowWidthPercent = webViewConfig.floatingWindowConfig.widthPercent
+        floatingWindowHeightPercent = webViewConfig.floatingWindowConfig.heightPercent
+        floatingWindowLockAspectRatio = webViewConfig.floatingWindowConfig.lockAspectRatio
+        floatingWindowOpacity = webViewConfig.floatingWindowConfig.opacity
+        floatingWindowCornerRadius = webViewConfig.floatingWindowConfig.cornerRadius
+        floatingWindowBorderStyle = webViewConfig.floatingWindowConfig.borderStyle.name
+        floatingWindowShowTitleBar = webViewConfig.floatingWindowConfig.showTitleBar
+        floatingWindowAutoHideTitleBar = webViewConfig.floatingWindowConfig.autoHideTitleBar
+        floatingWindowStartMinimized = webViewConfig.floatingWindowConfig.startMinimized
+        floatingWindowRememberPosition = webViewConfig.floatingWindowConfig.rememberPosition
+        floatingWindowEdgeSnapping = webViewConfig.floatingWindowConfig.edgeSnapping
+        floatingWindowShowResizeHandle = webViewConfig.floatingWindowConfig.showResizeHandle
+        floatingWindowLockPosition = webViewConfig.floatingWindowConfig.lockPosition
+        splashEnabled = webApp.splashEnabled
+        splashType = splashConfig?.type?.name ?: "IMAGE"
+        splashDuration = splashConfig?.duration ?: 3
+        splashClickToSkip = splashConfig?.clickToSkip ?: true
+        splashVideoStartMs = splashConfig?.videoStartMs ?: 0L
+        splashVideoEndMs = splashConfig?.videoEndMs ?: 5000L
+        splashLandscape = splashConfig?.orientation == com.webtoapp.data.model.SplashOrientation.LANDSCAPE
+        splashFillScreen = splashConfig?.fillScreen ?: true
+        splashEnableAudio = splashConfig?.enableAudio ?: false
 
-        appType = appType.name,
-        mediaEnableAudio = mediaConfig?.enableAudio ?: true,
-        mediaLoop = mediaConfig?.loop ?: true,
-        mediaAutoPlay = mediaConfig?.autoPlay ?: true,
-        mediaFillScreen = mediaConfig?.fillScreen ?: true,
-        mediaLandscape = mediaConfig?.orientation == com.webtoapp.data.model.SplashOrientation.LANDSCAPE,
-        mediaKeepScreenOn = mediaConfig?.keepScreenOn ?: true,
+        appType = webApp.appType.name
+        mediaEnableAudio = mediaConfig?.enableAudio ?: true
+        mediaLoop = mediaConfig?.loop ?: true
+        mediaAutoPlay = mediaConfig?.autoPlay ?: true
+        mediaFillScreen = mediaConfig?.fillScreen ?: true
+        mediaLandscape = mediaConfig?.orientation == com.webtoapp.data.model.SplashOrientation.LANDSCAPE
+        mediaKeepScreenOn = mediaConfig?.keepScreenOn ?: true
 
 
-        htmlEntryFile = htmlConfig?.getValidEntryFile() ?: "index.html",
-        htmlEnableJavaScript = htmlConfig?.enableJavaScript ?: true,
-        htmlEnableLocalStorage = htmlConfig?.enableLocalStorage ?: true,
-        htmlLandscapeMode = htmlConfig?.landscapeMode ?: false,
+        htmlEntryFile = htmlConfig?.getValidEntryFile() ?: "index.html"
+        htmlEnableJavaScript = htmlConfig?.enableJavaScript ?: true
+        htmlEnableLocalStorage = htmlConfig?.enableLocalStorage ?: true
+        htmlLandscapeMode = htmlConfig?.landscapeMode ?: false
 
 
         galleryItems = galleryConfig?.items?.mapIndexed { index, item ->
@@ -3531,25 +3532,25 @@ fun WebApp.toApkConfig(packageName: String, context: android.content.Context? = 
                 duration = item.duration,
                 thumbnailPath = if (item.thumbnailPath != null) "gallery/thumb_$index.jpg" else null
             )
-        } ?: emptyList(),
-        galleryPlayMode = galleryConfig?.playMode?.name ?: "SEQUENTIAL",
-        galleryImageInterval = galleryConfig?.imageInterval ?: 3,
-        galleryLoop = galleryConfig?.loop ?: true,
-        galleryAutoPlay = galleryConfig?.autoPlay ?: false,
-        galleryBackgroundColor = galleryConfig?.backgroundColor ?: "#000000",
-        galleryShowThumbnailBar = galleryConfig?.showThumbnailBar ?: true,
-        galleryShowMediaInfo = galleryConfig?.showMediaInfo ?: true,
-        galleryOrientation = galleryConfig?.orientation?.name ?: "PORTRAIT",
-        galleryEnableAudio = galleryConfig?.enableAudio ?: true,
-        galleryVideoAutoNext = galleryConfig?.videoAutoNext ?: true,
-        galleryShuffleOnLoop = galleryConfig?.shuffleOnLoop ?: false,
-        galleryDefaultView = galleryConfig?.defaultView?.name ?: "GRID",
-        galleryGridColumns = galleryConfig?.gridColumns ?: 3,
-        gallerySortOrder = galleryConfig?.sortOrder?.name ?: "CUSTOM",
-        galleryRememberPosition = galleryConfig?.rememberPosition ?: true,
+        } ?: emptyList()
+        galleryPlayMode = galleryConfig?.playMode?.name ?: "SEQUENTIAL"
+        galleryImageInterval = galleryConfig?.imageInterval ?: 3
+        galleryLoop = galleryConfig?.loop ?: true
+        galleryAutoPlay = galleryConfig?.autoPlay ?: false
+        galleryBackgroundColor = galleryConfig?.backgroundColor ?: "#000000"
+        galleryShowThumbnailBar = galleryConfig?.showThumbnailBar ?: true
+        galleryShowMediaInfo = galleryConfig?.showMediaInfo ?: true
+        galleryOrientation = galleryConfig?.orientation?.name ?: "PORTRAIT"
+        galleryEnableAudio = galleryConfig?.enableAudio ?: true
+        galleryVideoAutoNext = galleryConfig?.videoAutoNext ?: true
+        galleryShuffleOnLoop = galleryConfig?.shuffleOnLoop ?: false
+        galleryDefaultView = galleryConfig?.defaultView?.name ?: "GRID"
+        galleryGridColumns = galleryConfig?.gridColumns ?: 3
+        gallerySortOrder = galleryConfig?.sortOrder?.name ?: "CUSTOM"
+        galleryRememberPosition = galleryConfig?.rememberPosition ?: true
 
 
-        bgmEnabled = bgmEnabled,
+        bgmEnabled = webApp.bgmEnabled
         bgmPlaylist = bgmConfig?.playlist?.mapIndexed { index, item ->
             BgmShellItem(
                 id = item.id,
@@ -3558,11 +3559,11 @@ fun WebApp.toApkConfig(packageName: String, context: android.content.Context? = 
                 lrcAssetPath = if (item.lrcData != null) "bgm/bgm_$index.lrc" else null,
                 sortOrder = item.sortOrder
             )
-        } ?: emptyList(),
-        bgmPlayMode = bgmConfig?.playMode?.name ?: "LOOP",
-        bgmVolume = bgmConfig?.volume ?: 0.5f,
-        bgmAutoPlay = bgmConfig?.autoPlay ?: true,
-        bgmShowLyrics = bgmConfig?.showLyrics ?: true,
+        } ?: emptyList()
+        bgmPlayMode = bgmConfig?.playMode?.name ?: "LOOP"
+        bgmVolume = bgmConfig?.volume ?: 0.5f
+        bgmAutoPlay = bgmConfig?.autoPlay ?: true
+        bgmShowLyrics = bgmConfig?.showLyrics ?: true
         bgmLrcTheme = bgmConfig?.lrcTheme?.let { theme ->
             LrcShellTheme(
                 id = theme.id,
@@ -3574,30 +3575,30 @@ fun WebApp.toApkConfig(packageName: String, context: android.content.Context? = 
                 animationType = theme.animationType.name,
                 position = theme.position.name
             )
-        },
+        }
 
-        themeType = themeType,
-        darkMode = "SYSTEM",
+        themeType = webApp.themeType
+        darkMode = "SYSTEM"
 
-        translateEnabled = translateEnabled,
-        translateTargetLanguage = translateConfig?.targetLanguage?.code ?: "zh-CN",
-        translateShowButton = translateConfig?.showFloatingButton ?: true,
+        translateEnabled = webApp.translateEnabled
+        translateTargetLanguage = translateConfig?.targetLanguage?.code ?: "zh-CN"
+        translateShowButton = translateConfig?.showFloatingButton ?: true
 
-        extensionEnabled = extensionEnabled,
-        extensionFabIcon = extensionFabIcon ?: "",
-        extensionModuleIds = extensionModuleIds,
+        extensionEnabled = webApp.extensionEnabled
+        extensionFabIcon = webApp.extensionFabIcon ?: ""
+        extensionModuleIds = webApp.extensionModuleIds
 
-        bootStartEnabled = autoStartConfig?.bootStartEnabled ?: false,
-        scheduledStartEnabled = autoStartConfig?.scheduledStartEnabled ?: false,
-        scheduledTime = autoStartConfig?.scheduledTime ?: "08:00",
-        scheduledDays = autoStartConfig?.scheduledDays ?: listOf(1, 2, 3, 4, 5, 6, 7),
+        bootStartEnabled = autoStartConfig?.bootStartEnabled ?: false
+        scheduledStartEnabled = autoStartConfig?.scheduledStartEnabled ?: false
+        scheduledTime = autoStartConfig?.scheduledTime ?: "08:00"
+        scheduledDays = autoStartConfig?.scheduledDays ?: listOf(1, 2, 3, 4, 5, 6, 7)
 
-        forcedRunConfig = forcedRunConfig,
+        forcedRunConfig = webApp.forcedRunConfig
 
-        isolationEnabled = apkExportConfig?.isolationConfig?.enabled ?: false,
-        isolationConfig = apkExportConfig?.isolationConfig,
+        isolationEnabled = apkExportConfig?.isolationConfig?.enabled ?: false
+        isolationConfig = apkExportConfig?.isolationConfig
 
-        backgroundRunEnabled = apkExportConfig?.backgroundRunEnabled ?: false,
+        backgroundRunEnabled = apkExportConfig?.backgroundRunEnabled ?: false
         backgroundRunConfig = apkExportConfig?.backgroundRunConfig?.let {
             BackgroundRunConfig(
                 notificationTitle = it.notificationTitle,
@@ -3605,9 +3606,9 @@ fun WebApp.toApkConfig(packageName: String, context: android.content.Context? = 
                 showNotification = it.showNotification,
                 keepCpuAwake = it.keepCpuAwake
             )
-        },
+        }
 
-        notificationEnabled = apkExportConfig?.notificationEnabled ?: false,
+        notificationEnabled = apkExportConfig?.notificationEnabled ?: false
         notificationConfig = apkExportConfig?.notificationConfig?.let {
             NotificationConfig(
                 type = it.type.key,
@@ -3617,72 +3618,72 @@ fun WebApp.toApkConfig(packageName: String, context: android.content.Context? = 
                 pollHeaders = it.pollHeaders,
                 clickUrl = it.clickUrl
             )
-        },
+        }
 
-        blackTechConfig = blackTechConfig,
+        blackTechConfig = webApp.blackTechConfig
 
-        disguiseConfig = disguiseConfig,
+        disguiseConfig = webApp.disguiseConfig
 
-        browserDisguiseConfig = browserDisguiseConfig,
+        browserDisguiseConfig = webApp.browserDisguiseConfig
 
-        deviceDisguiseConfig = deviceDisguiseConfig,
+        deviceDisguiseConfig = webApp.deviceDisguiseConfig
 
-        language = com.webtoapp.core.i18n.Strings.currentLanguage.value.name,
+        language = com.webtoapp.core.i18n.Strings.currentLanguage.value.name
 
-        engineType = apkExportConfig?.engineType ?: "SYSTEM_WEBVIEW",
+        engineType = apkExportConfig?.engineType ?: "SYSTEM_WEBVIEW"
 
-        deepLinkEnabled = apkExportConfig?.deepLinkEnabled ?: false,
+        deepLinkEnabled = apkExportConfig?.deepLinkEnabled ?: false
         deepLinkHosts = buildOAuthReturnHosts(
-            url = url,
+            url = webApp.url,
             customHosts = apkExportConfig?.customDeepLinkHosts ?: emptyList(),
             includeCustomHosts = apkExportConfig?.deepLinkEnabled == true
-        ),
+        )
 
-        wordpressSiteTitle = wordpressConfig?.siteTitle ?: "",
-        wordpressAdminUser = wordpressConfig?.adminUser ?: "admin",
-        wordpressAdminEmail = wordpressConfig?.adminEmail ?: "",
-        wordpressAdminPassword = wordpressConfig?.adminPassword ?: "admin",
-        wordpressThemeName = wordpressConfig?.themeName ?: "",
-        wordpressPlugins = wordpressConfig?.plugins ?: emptyList(),
-        wordpressActivePlugins = wordpressConfig?.activePlugins ?: emptyList(),
-        wordpressPermalinkStructure = wordpressConfig?.permalinkStructure ?: "/%postname%/",
-        wordpressSiteLanguage = wordpressConfig?.siteLanguage ?: "zh_CN",
-        wordpressAutoInstall = wordpressConfig?.autoInstall ?: true,
-        wordpressPhpPort = wordpressConfig?.phpPort ?: 0,
-        wordpressLandscapeMode = wordpressConfig?.landscapeMode ?: false,
-
-
-        nodejsMode = nodejsConfig?.buildMode?.name ?: "STATIC",
-        nodejsPort = nodejsConfig?.serverPort ?: 0,
-        nodejsEntryFile = nodejsConfig?.entryFile ?: "",
-        nodejsEnvVars = nodejsConfig?.envVars ?: emptyMap(),
-        nodejsLandscapeMode = nodejsConfig?.landscapeMode ?: false,
+        wordpressSiteTitle = wordpressConfig?.siteTitle ?: ""
+        wordpressAdminUser = wordpressConfig?.adminUser ?: "admin"
+        wordpressAdminEmail = wordpressConfig?.adminEmail ?: ""
+        wordpressAdminPassword = wordpressConfig?.adminPassword ?: "admin"
+        wordpressThemeName = wordpressConfig?.themeName ?: ""
+        wordpressPlugins = wordpressConfig?.plugins ?: emptyList()
+        wordpressActivePlugins = wordpressConfig?.activePlugins ?: emptyList()
+        wordpressPermalinkStructure = wordpressConfig?.permalinkStructure ?: "/%postname%/"
+        wordpressSiteLanguage = wordpressConfig?.siteLanguage ?: "zh_CN"
+        wordpressAutoInstall = wordpressConfig?.autoInstall ?: true
+        wordpressPhpPort = wordpressConfig?.phpPort ?: 0
+        wordpressLandscapeMode = wordpressConfig?.landscapeMode ?: false
 
 
-        phpAppFramework = phpAppConfig?.framework ?: "",
-        phpAppDocumentRoot = phpAppConfig?.documentRoot ?: "",
-        phpAppEntryFile = phpAppConfig?.entryFile ?: "index.php",
-        phpAppPort = phpAppConfig?.phpPort ?: 0,
-        phpAppEnvVars = phpAppConfig?.envVars ?: emptyMap(),
-        phpAppLandscapeMode = phpAppConfig?.landscapeMode ?: false,
+        nodejsMode = nodejsConfig?.buildMode?.name ?: "STATIC"
+        nodejsPort = nodejsConfig?.serverPort ?: 0
+        nodejsEntryFile = nodejsConfig?.entryFile ?: ""
+        nodejsEnvVars = nodejsConfig?.envVars ?: emptyMap()
+        nodejsLandscapeMode = nodejsConfig?.landscapeMode ?: false
 
 
-        pythonAppFramework = pythonAppConfig?.framework ?: "",
-        pythonAppEntryFile = pythonAppConfig?.entryFile ?: "app.py",
-        pythonAppEntryModule = pythonAppConfig?.entryModule ?: "",
-        pythonAppServerType = pythonAppConfig?.serverType ?: "builtin",
-        pythonAppPort = pythonAppConfig?.serverPort ?: 0,
-        pythonAppEnvVars = pythonAppConfig?.envVars ?: emptyMap(),
-        pythonAppLandscapeMode = pythonAppConfig?.landscapeMode ?: false,
+        phpAppFramework = phpAppConfig?.framework ?: ""
+        phpAppDocumentRoot = phpAppConfig?.documentRoot ?: ""
+        phpAppEntryFile = phpAppConfig?.entryFile ?: "index.php"
+        phpAppPort = phpAppConfig?.phpPort ?: 0
+        phpAppEnvVars = phpAppConfig?.envVars ?: emptyMap()
+        phpAppLandscapeMode = phpAppConfig?.landscapeMode ?: false
 
 
-        goAppFramework = goAppConfig?.framework ?: "",
-        goAppBinaryName = goAppConfig?.binaryName ?: "",
-        goAppTargetArch = goAppConfig?.targetArch ?: "arm64-v8a",
-        goAppPort = goAppConfig?.serverPort ?: 0,
-        goAppStaticDir = goAppConfig?.staticDir ?: "",
-        goAppEnvVars = goAppConfig?.envVars ?: emptyMap(),
-        goAppLandscapeMode = goAppConfig?.landscapeMode ?: false,
+        pythonAppFramework = pythonAppConfig?.framework ?: ""
+        pythonAppEntryFile = pythonAppConfig?.entryFile ?: "app.py"
+        pythonAppEntryModule = pythonAppConfig?.entryModule ?: ""
+        pythonAppServerType = pythonAppConfig?.serverType ?: "builtin"
+        pythonAppPort = pythonAppConfig?.serverPort ?: 0
+        pythonAppEnvVars = pythonAppConfig?.envVars ?: emptyMap()
+        pythonAppLandscapeMode = pythonAppConfig?.landscapeMode ?: false
+
+
+        goAppFramework = goAppConfig?.framework ?: ""
+        goAppBinaryName = goAppConfig?.binaryName ?: ""
+        goAppTargetArch = goAppConfig?.targetArch ?: "arm64-v8a"
+        goAppPort = goAppConfig?.serverPort ?: 0
+        goAppStaticDir = goAppConfig?.staticDir ?: ""
+        goAppEnvVars = goAppConfig?.envVars ?: emptyMap()
+        goAppLandscapeMode = goAppConfig?.landscapeMode ?: false
 
 
         multiWebSites = multiWebConfig?.sites?.map { site ->
@@ -3698,13 +3699,13 @@ fun WebApp.toApkConfig(packageName: String, context: android.content.Context? = 
                 linkSelector = site.linkSelector,
                 enabled = site.enabled
             )
-        } ?: emptyList(),
-        multiWebDisplayMode = multiWebConfig?.displayMode ?: "TABS",
-        multiWebRefreshInterval = multiWebConfig?.refreshInterval ?: 30,
-        multiWebShowSiteIcons = multiWebConfig?.showSiteIcons ?: true,
-        multiWebLandscapeMode = multiWebConfig?.landscapeMode ?: false,
+        } ?: emptyList()
+        multiWebDisplayMode = multiWebConfig?.displayMode ?: "TABS"
+        multiWebRefreshInterval = multiWebConfig?.refreshInterval ?: 30
+        multiWebShowSiteIcons = multiWebConfig?.showSiteIcons ?: true
+        multiWebLandscapeMode = multiWebConfig?.landscapeMode ?: false
         multiWebProjectId = multiWebConfig?.projectId ?: ""
-    )
+    }
 }
 
 
@@ -3914,9 +3915,9 @@ fun WebApp.toApkConfigWithModules(packageName: String, context: android.content.
         emptyList()
     }
 
-    return baseConfig.copy(
+    return baseConfig.apply {
         embeddedExtensionModules = embeddedModules
-    )
+    }
 }
 
 

@@ -25,12 +25,13 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "Web",
-                    packageName = "com.example.web",
-                    targetUrl = "https://example.com",
-                    appType = "WEB"
-                ),
+                config = testApkConfig(
+            appName = "Web",
+            packageName = "com.example.web",
+            targetUrl = "https://example.com"
+        ).apply {
+            appType = "WEB"
+        },
                 encryptionEnabled = false
             )
         )
@@ -49,12 +50,13 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "Image",
-                    packageName = "com.example.image",
-                    targetUrl = "",
-                    appType = "IMAGE"
-                ),
+                config = testApkConfig(
+            appName = "Image",
+            packageName = "com.example.image",
+            targetUrl = ""
+        ).apply {
+            appType = "IMAGE"
+        },
                 encryptionEnabled = false
             )
         )
@@ -77,13 +79,14 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "HTML",
-                    packageName = "com.example.html",
-                    targetUrl = "",
-                    appType = "HTML",
-                    htmlEntryFile = "index.html"
-                ),
+                config = testApkConfig(
+            appName = "HTML",
+            packageName = "com.example.html",
+            targetUrl = ""
+        ).apply {
+            appType = "HTML"
+            htmlEntryFile = "index.html"
+        },
                 encryptionEnabled = true,
                 htmlFiles = listOf(HtmlFile("index.html", index.absolutePath, HtmlFileType.HTML))
             )
@@ -103,12 +106,13 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "Gallery",
-                    packageName = "com.example.gallery",
-                    targetUrl = "",
-                    appType = "GALLERY"
-                ),
+                config = testApkConfig(
+            appName = "Gallery",
+            packageName = "com.example.gallery",
+            targetUrl = ""
+        ).apply {
+            appType = "GALLERY"
+        },
                 encryptionEnabled = false,
                 galleryItems = listOf(
                     GalleryItem(
@@ -138,12 +142,13 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "Node",
-                    packageName = "com.example.node",
-                    targetUrl = "",
-                    appType = "NODEJS_APP"
-                ),
+                config = testApkConfig(
+            appName = "Node",
+            packageName = "com.example.node",
+            targetUrl = ""
+        ).apply {
+            appType = "NODEJS_APP"
+        },
                 encryptionEnabled = false,
                 nodejsProjectDir = projectDir
             )
@@ -166,13 +171,14 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "Frontend",
-                    packageName = "com.example.frontend",
-                    targetUrl = "",
-                    appType = "FRONTEND",
-                    htmlEntryFile = "index.html"
-                ),
+                config = testApkConfig(
+            appName = "Frontend",
+            packageName = "com.example.frontend",
+            targetUrl = ""
+        ).apply {
+            appType = "FRONTEND"
+            htmlEntryFile = "index.html"
+        },
                 encryptionEnabled = false,
                 htmlFiles = listOf(HtmlFile("index.html", index.absolutePath, HtmlFileType.HTML))
             )
@@ -211,12 +217,13 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "WordPress",
-                    packageName = "com.example.wordpress",
-                    targetUrl = "",
-                    appType = "WORDPRESS"
-                ),
+                config = testApkConfig(
+            appName = "WordPress",
+            packageName = "com.example.wordpress",
+            targetUrl = ""
+        ).apply {
+            appType = "WORDPRESS"
+        },
                 encryptionEnabled = false,
                 wordPressProjectDir = projectDir
             )
@@ -273,12 +280,13 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "Python",
-                    packageName = "com.example.python",
-                    targetUrl = "",
-                    appType = "PYTHON_APP"
-                ),
+                config = testApkConfig(
+            appName = "Python",
+            packageName = "com.example.python",
+            targetUrl = ""
+        ).apply {
+            appType = "PYTHON_APP"
+        },
                 encryptionEnabled = false,
                 pythonAppProjectDir = projectDir
             )
@@ -340,12 +348,13 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "Python Django",
-                    packageName = "com.example.python.django",
-                    targetUrl = "",
-                    appType = "PYTHON_APP"
-                ),
+                config = testApkConfig(
+            appName = "Python Django",
+            packageName = "com.example.python.django",
+            targetUrl = ""
+        ).apply {
+            appType = "PYTHON_APP"
+        },
                 encryptionEnabled = false,
                 pythonAppProjectDir = projectDir
             )
@@ -369,12 +378,13 @@ class ApkArtifactVerifierTest {
         val result = ApkArtifactVerifier.verify(
             ApkArtifactVerificationRequest(
                 apkFile = apk,
-                config = ApkConfig(
-                    appName = "Multi Web",
-                    packageName = "com.example.multiweb",
-                    targetUrl = "",
-                    appType = "MULTI_WEB"
-                ),
+                config = testApkConfig(
+            appName = "Multi Web",
+            packageName = "com.example.multiweb",
+            targetUrl = ""
+        ).apply {
+            appType = "MULTI_WEB"
+        },
                 encryptionEnabled = false,
                 multiWebSites = listOf(
                     MultiWebSite(

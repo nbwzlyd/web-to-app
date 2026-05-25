@@ -15,16 +15,17 @@ class ApkConfigJsonFactoryTest {
 
     @Test
     fun `create emits valid json with escaped user content`() {
-        val config = ApkConfig(
+        val config = testApkConfig(
             appName = "Quote \" Slash \\ Line\nTab\t",
             packageName = "com.example.generated",
-            targetUrl = "https://example.com/path?name=\"web\\app\"",
-            versionCode = 7,
-            versionName = "1.2.\"beta\"",
-            activationCodes = listOf("alpha\"one", "line\ncode"),
-            announcementContent = "Hello \"world\"\n<script>alert('\\u2028')</script>",
-            userAgent = "Mozilla/5.0 \"Custom\"",
-            customUserAgent = "Custom\\Agent\nNext",
+            targetUrl = "https://example.com/path?name=\"web\\app\""
+        ).apply {
+            versionCode = 7
+            versionName = "1.2.\"beta\""
+            activationCodes = listOf("alpha\"one", "line\ncode")
+            announcementContent = "Hello \"world\"\n<script>alert('\\u2028')</script>"
+            userAgent = "Mozilla/5.0 \"Custom\""
+            customUserAgent = "Custom\\Agent\nNext"
             injectScripts = listOf(
                 UserScript(
                     name = "boot \"script\"",
@@ -32,11 +33,11 @@ class ApkConfigJsonFactoryTest {
                     enabled = true,
                     runAt = ScriptRunTime.DOCUMENT_START
                 )
-            ),
-            statusBarBackgroundType = "IMAGE",
-            statusBarBackgroundImage = "/tmp/light background.png",
-            statusBarBackgroundTypeDark = "IMAGE",
-            statusBarBackgroundImageDark = "/tmp/dark background.png",
+            )
+            statusBarBackgroundType = "IMAGE"
+            statusBarBackgroundImage = "/tmp/light background.png"
+            statusBarBackgroundTypeDark = "IMAGE"
+            statusBarBackgroundImageDark = "/tmp/dark background.png"
             networkTrustConfig = NetworkTrustConfig(
                 trustUserCa = true,
                 customCaCertificates = listOf(
@@ -47,8 +48,8 @@ class ApkConfigJsonFactoryTest {
                         sha256 = "abc123"
                     )
                 )
-            ),
-            bgmEnabled = true,
+            )
+            bgmEnabled = true
             bgmPlaylist = listOf(
                 BgmShellItem(
                     id = "track\"1",
@@ -58,7 +59,7 @@ class ApkConfigJsonFactoryTest {
                     sortOrder = 3
                 )
             )
-        )
+        }
 
         val json = ApkConfigJsonFactory.create(config)
         val root = JsonParser.parseString(json).asJsonObject
@@ -83,23 +84,24 @@ class ApkConfigJsonFactoryTest {
 
     @Test
     fun `create output is consumable by ShellConfig`() {
-        val config = ApkConfig(
+        val config = testApkConfig(
             appName = "Shell Ready",
             packageName = "com.example.shellready",
-            targetUrl = "https://example.com",
-            javaScriptEnabled = false,
+            targetUrl = "https://example.com"
+        ).apply {
+            javaScriptEnabled = false
             injectScripts = listOf(
                 UserScript(
                     name = "start",
                     code = "window.__ready = true;",
                     runAt = ScriptRunTime.DOCUMENT_IDLE
                 )
-            ),
-            bootStartEnabled = true,
-            scheduledStartEnabled = true,
-            scheduledTime = "07:30",
+            )
+            bootStartEnabled = true
+            scheduledStartEnabled = true
+            scheduledTime = "07:30"
             scheduledDays = listOf(1, 3, 5)
-        )
+        }
 
         val shellConfig = GsonProvider.gson.fromJson(
             ApkConfigJsonFactory.create(config),
@@ -117,12 +119,13 @@ class ApkConfigJsonFactoryTest {
     fun `create rejects web config with blank target url`() {
         val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
             ApkConfigJsonFactory.create(
-                ApkConfig(
-                    appName = "Broken Web",
-                    packageName = "com.example.brokenweb",
-                    targetUrl = "   ",
-                    appType = "WEB"
-                )
+                testApkConfig(
+            appName = "Broken Web",
+            packageName = "com.example.brokenweb",
+            targetUrl = "   "
+        ).apply {
+            appType = "WEB"
+        }
             )
         }
 
@@ -133,13 +136,14 @@ class ApkConfigJsonFactoryTest {
     fun `create rejects html config with invalid entry file`() {
         val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
             ApkConfigJsonFactory.create(
-                ApkConfig(
-                    appName = "Broken Html",
-                    packageName = "com.example.brokenhtml",
-                    targetUrl = "",
-                    appType = "HTML",
-                    htmlEntryFile = ".html"
-                )
+                testApkConfig(
+            appName = "Broken Html",
+            packageName = "com.example.brokenhtml",
+            targetUrl = ""
+        ).apply {
+            appType = "HTML"
+            htmlEntryFile = ".html"
+        }
             )
         }
 
@@ -150,12 +154,13 @@ class ApkConfigJsonFactoryTest {
     fun `create allows server backed app type without target url`() {
         val root = JsonParser.parseString(
             ApkConfigJsonFactory.create(
-                ApkConfig(
-                    appName = "Node App",
-                    packageName = "com.example.nodeapp",
-                    targetUrl = "",
-                    appType = "NODEJS_APP"
-                )
+                testApkConfig(
+            appName = "Node App",
+            packageName = "com.example.nodeapp",
+            targetUrl = ""
+        ).apply {
+            appType = "NODEJS_APP"
+        }
             )
         ).asJsonObject
 
@@ -165,19 +170,20 @@ class ApkConfigJsonFactoryTest {
 
     @Test
     fun `disabled optional services keep legacy null payloads`() {
-        val config = ApkConfig(
+        val config = testApkConfig(
             appName = "Optional Off",
             packageName = "com.example.optionaloff",
-            targetUrl = "https://example.com",
-            backgroundRunEnabled = false,
+            targetUrl = "https://example.com"
+        ).apply {
+            backgroundRunEnabled = false
             backgroundRunConfig = BackgroundRunConfig(
                 notificationTitle = "Should not leak"
-            ),
-            notificationEnabled = false,
+            )
+            notificationEnabled = false
             notificationConfig = NotificationConfig(
                 pollUrl = "https://example.com/poll"
             )
-        )
+        }
 
         val root = JsonParser.parseString(ApkConfigJsonFactory.create(config)).asJsonObject
 
@@ -187,15 +193,16 @@ class ApkConfigJsonFactoryTest {
 
     @Test
     fun `encrypted stub keeps only public placeholder fields`() {
-        val config = ApkConfig(
+        val config = testApkConfig(
             appName = "Private \"App\"",
             packageName = "com.example.private",
-            targetUrl = "https://secret.example.com/token?value=hidden",
-            versionCode = 99,
-            versionName = "9.9.9",
-            customUserAgent = "SensitiveAgent/1.0",
+            targetUrl = "https://secret.example.com/token?value=hidden"
+        ).apply {
+            versionCode = 99
+            versionName = "9.9.9"
+            customUserAgent = "SensitiveAgent/1.0"
             activationCodes = listOf("SECRET-CODE")
-        )
+        }
 
         val json = ApkConfigJsonFactory.createEncryptedStub(config)
         val root = JsonParser.parseString(json).asJsonObject
@@ -215,10 +222,11 @@ class ApkConfigJsonFactoryTest {
 
     @Test
     fun `embedded modules serialize nested rules and config values structurally`() {
-        val config = ApkConfig(
+        val config = testApkConfig(
             appName = "Modules",
             packageName = "com.example.modules",
-            targetUrl = "https://example.com",
+            targetUrl = "https://example.com"
+        ).apply {
             embeddedExtensionModules = listOf(
                 EmbeddedExtensionModule(
                     id = "module\"one",
@@ -238,7 +246,7 @@ class ApkConfigJsonFactoryTest {
                     )
                 )
             )
-        )
+        }
 
         val module = JsonParser.parseString(ApkConfigJsonFactory.create(config))
             .asJsonObject

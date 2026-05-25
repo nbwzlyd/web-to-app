@@ -705,355 +705,355 @@ internal object ApkConfigValidator {
 
 
 
-data class ApkConfig(
-    val appName: String,
-    val packageName: String,
-    val targetUrl: String,
-    val versionCode: Int = 1,
-    val versionName: String = "1.0.0",
-    val iconPath: String? = null,
-    val runtimePermissions: com.webtoapp.data.model.ApkRuntimePermissions = com.webtoapp.data.model.ApkRuntimePermissions(),
-    val networkTrustConfig: com.webtoapp.data.model.NetworkTrustConfig = com.webtoapp.data.model.NetworkTrustConfig(),
-
-
-    val activationEnabled: Boolean = false,
-    val activationCodes: List<String> = emptyList(),
-    val activationRequireEveryTime: Boolean = false,
-    val activationDialogTitle: String = "",
-    val activationDialogSubtitle: String = "",
-    val activationDialogInputLabel: String = "",
-    val activationDialogButtonText: String = "",
-
-
-    val adBlockEnabled: Boolean = false,
-    val adBlockRules: List<String> = emptyList(),
-
-
-    val announcementEnabled: Boolean = false,
-    val announcementTitle: String = "",
-    val announcementContent: String = "",
-    val announcementLink: String = "",
-    val announcementLinkText: String = "",
-    val announcementTemplate: String = "MINIMAL",
-    val announcementShowEmoji: Boolean = true,
-    val announcementAnimationEnabled: Boolean = true,
-    val announcementShowOnce: Boolean = true,
-    val announcementRequireConfirmation: Boolean = false,
-    val announcementAllowNeverShow: Boolean = false,
-    val announcementTriggerOnLaunch: Boolean = true,
-    val announcementTriggerOnNoNetwork: Boolean = false,
-    val announcementTriggerIntervalMinutes: Int = 0,
-
-
-    val adsEnabled: Boolean = false,
-    val adBannerEnabled: Boolean = false,
-    val adBannerId: String = "",
-    val adInterstitialEnabled: Boolean = false,
-    val adInterstitialId: String = "",
-    val adSplashEnabled: Boolean = false,
-    val adSplashId: String = "",
-
-
-    val javaScriptEnabled: Boolean = true,
-    val domStorageEnabled: Boolean = true,
-    val allowFileAccess: Boolean = false,
-    val allowContentAccess: Boolean = true,
-    val cacheEnabled: Boolean = true,
-    val zoomEnabled: Boolean = true,
-    val desktopMode: Boolean = false,
-    val userAgent: String? = null,
-    val userAgentMode: String = "DEFAULT",
-    val customUserAgent: String? = null,
-    val hideToolbar: Boolean = false,
-    val hideBrowserToolbar: Boolean = false,
-    val showStatusBarInFullscreen: Boolean = false,
-    val showNavigationBarInFullscreen: Boolean = false,
-    val showToolbarInFullscreen: Boolean = false,
-    val landscapeMode: Boolean = false,
-    val orientationMode: String = "PORTRAIT",
-    val injectScripts: List<com.webtoapp.data.model.UserScript> = emptyList(),
-
-
-    val statusBarColorMode: String = "THEME",
-    val statusBarColor: String? = null,
-    val statusBarDarkIcons: Boolean? = null,
-    val statusBarBackgroundType: String = "COLOR",
-    val statusBarBackgroundImage: String? = null,
-    val statusBarBackgroundAlpha: Float = 1.0f,
-    val statusBarHeightDp: Int = 0,
-
-    val statusBarColorModeDark: String = "THEME",
-    val statusBarColorDark: String? = null,
-    val statusBarDarkIconsDark: Boolean? = null,
-    val statusBarBackgroundTypeDark: String = "COLOR",
-    val statusBarBackgroundImageDark: String? = null,
-    val statusBarBackgroundAlphaDark: Float = 1.0f,
-    val longPressMenuEnabled: Boolean = true,
-    val longPressMenuStyle: String = "FULL",
-    val adBlockToggleEnabled: Boolean = false,
-    val popupBlockerEnabled: Boolean = false,
-    val popupBlockerToggleEnabled: Boolean = false,
-    val openExternalLinks: Boolean = false,
-
-
-    val initialScale: Int = 0,
-    val viewportMode: String = "DEFAULT",
-    val customViewportWidth: Int = 0,
-    val newWindowBehavior: String = "SAME_WINDOW",
-    val enablePaymentSchemes: Boolean = true,
-    val enableShareBridge: Boolean = true,
-    val enableZoomPolyfill: Boolean = true,
-    val enableCrossOriginIsolation: Boolean = false,
-    val hideUrlPreview: Boolean = false,
-    val disableShields: Boolean = true,
-    val decodeBase64DeepLinks: Boolean = false,
-    val mediaAutoplayEnabled: Boolean = true,
-    val acceptThirdPartyCookies: Boolean = true,
-    val enableKernelDisguise: Boolean = true,
-    val enableImageRepair: Boolean = true,
-    val enableScrollMemory: Boolean = true,
-    val enableHttpsUpgrade: Boolean = true,
-    val enableOAuthExternalRedirect: Boolean = true,
-    val enableClipboardPolyfill: Boolean = true,
-    val enableNotificationPolyfill: Boolean = true,
-    val safeBrowsingEnabled: Boolean = true,
-    val geolocationEnabled: Boolean = true,
-    val enableOrientationPolyfill: Boolean = true,
-    val enableCompatPolyfills: Boolean = true,
-    val enableNativeBridge: Boolean = true,
-    val javaScriptCanOpenWindows: Boolean = true,
-    val databaseEnabled: Boolean = true,
-    val enableCookiePersistence: Boolean = true,
-    val enablePrivateNetworkBridge: Boolean = true,
-    val allowMixedContent: Boolean = true,
-    val enableGpc: Boolean = true,
-    val enableCookieConsentBlock: Boolean = true,
-    val enableReferrerPolicy: Boolean = true,
-    val enableTrackerBlocking: Boolean = true,
-    val enableBlobDownloadInterception: Boolean = true,
-    val keepScreenOn: Boolean = false,
-    val screenAwakeMode: String = "OFF",
-    val screenAwakeTimeoutMinutes: Int = 30,
-    val screenBrightness: Int = -1,
-    val keyboardAdjustMode: String = "RESIZE",
-    val showFloatingBackButton: Boolean = false,
-    val swipeRefreshEnabled: Boolean = true,
-    val fullscreenEnabled: Boolean = true,
-    val performanceOptimization: Boolean = false,
-    val pwaOfflineEnabled: Boolean = false,
-    val pwaOfflineStrategy: String = "NETWORK_FIRST",
-
-
-    val proxyMode: String = "NONE",
-    val proxyHost: String = "",
-    val proxyPort: Int = 0,
-    val proxyType: String = "HTTP",
-    val pacUrl: String = "",
-    val proxyBypassRules: List<String> = emptyList(),
-    val proxyUsername: String = "",
-    val proxyPassword: String = "",
-    val hostsMappingEnabled: Boolean = false,
-    val hostsMappings: List<com.webtoapp.data.model.HostMappingEntry> = emptyList(),
-
-
-    val dnsMode: String = "SYSTEM",
-    val dnsConfig: DnsApkConfig = DnsApkConfig(),
-
-
-    val errorPageMode: String = "BUILTIN_STYLE",
-    val errorPageBuiltInStyle: String = "MATERIAL",
-    val errorPageShowMiniGame: Boolean = false,
-    val errorPageMiniGameType: String = "RANDOM",
-    val errorPageAutoRetrySeconds: Int = 15,
-    val errorPageCustomHtml: String = "",
-    val errorPageCustomMediaPath: String = "",
-    val errorPageRetryButtonText: String = "",
-
-
-    val floatingWindowEnabled: Boolean = false,
-    val floatingWindowSizePercent: Int = 80,
-    val floatingWindowWidthPercent: Int = 80,
-    val floatingWindowHeightPercent: Int = 80,
-    val floatingWindowLockAspectRatio: Boolean = true,
-    val floatingWindowOpacity: Int = 100,
-    val floatingWindowCornerRadius: Int = 16,
-    val floatingWindowBorderStyle: String = "SUBTLE",
-    val floatingWindowShowTitleBar: Boolean = true,
-    val floatingWindowAutoHideTitleBar: Boolean = false,
-    val floatingWindowStartMinimized: Boolean = false,
-    val floatingWindowRememberPosition: Boolean = true,
-    val floatingWindowEdgeSnapping: Boolean = true,
-    val floatingWindowShowResizeHandle: Boolean = true,
-    val floatingWindowLockPosition: Boolean = false,
-
-
-    val splashEnabled: Boolean = false,
-    val splashType: String = "IMAGE",
-    val splashDuration: Int = 3,
-    val splashClickToSkip: Boolean = true,
-    val splashVideoStartMs: Long = 0,
-    val splashVideoEndMs: Long = 5000,
-    val splashLandscape: Boolean = false,
-    val splashFillScreen: Boolean = true,
-    val splashEnableAudio: Boolean = false,
+class ApkConfig(
+    var appName: String,
+    var packageName: String,
+    var targetUrl: String
+) {
+    var versionCode: Int = 1
+    var versionName: String = "1.0.0"
+    var iconPath: String? = null
+    var runtimePermissions: com.webtoapp.data.model.ApkRuntimePermissions = com.webtoapp.data.model.ApkRuntimePermissions()
+    var networkTrustConfig: com.webtoapp.data.model.NetworkTrustConfig = com.webtoapp.data.model.NetworkTrustConfig()
+
+
+    var activationEnabled: Boolean = false
+    var activationCodes: List<String> = emptyList()
+    var activationRequireEveryTime: Boolean = false
+    var activationDialogTitle: String = ""
+    var activationDialogSubtitle: String = ""
+    var activationDialogInputLabel: String = ""
+    var activationDialogButtonText: String = ""
+
+
+    var adBlockEnabled: Boolean = false
+    var adBlockRules: List<String> = emptyList()
+
+
+    var announcementEnabled: Boolean = false
+    var announcementTitle: String = ""
+    var announcementContent: String = ""
+    var announcementLink: String = ""
+    var announcementLinkText: String = ""
+    var announcementTemplate: String = "MINIMAL"
+    var announcementShowEmoji: Boolean = true
+    var announcementAnimationEnabled: Boolean = true
+    var announcementShowOnce: Boolean = true
+    var announcementRequireConfirmation: Boolean = false
+    var announcementAllowNeverShow: Boolean = false
+    var announcementTriggerOnLaunch: Boolean = true
+    var announcementTriggerOnNoNetwork: Boolean = false
+    var announcementTriggerIntervalMinutes: Int = 0
+
+
+    var adsEnabled: Boolean = false
+    var adBannerEnabled: Boolean = false
+    var adBannerId: String = ""
+    var adInterstitialEnabled: Boolean = false
+    var adInterstitialId: String = ""
+    var adSplashEnabled: Boolean = false
+    var adSplashId: String = ""
+
+
+    var javaScriptEnabled: Boolean = true
+    var domStorageEnabled: Boolean = true
+    var allowFileAccess: Boolean = false
+    var allowContentAccess: Boolean = true
+    var cacheEnabled: Boolean = true
+    var zoomEnabled: Boolean = true
+    var desktopMode: Boolean = false
+    var userAgent: String? = null
+    var userAgentMode: String = "DEFAULT"
+    var customUserAgent: String? = null
+    var hideToolbar: Boolean = false
+    var hideBrowserToolbar: Boolean = false
+    var showStatusBarInFullscreen: Boolean = false
+    var showNavigationBarInFullscreen: Boolean = false
+    var showToolbarInFullscreen: Boolean = false
+    var landscapeMode: Boolean = false
+    var orientationMode: String = "PORTRAIT"
+    var injectScripts: List<com.webtoapp.data.model.UserScript> = emptyList()
+
+
+    var statusBarColorMode: String = "THEME"
+    var statusBarColor: String? = null
+    var statusBarDarkIcons: Boolean? = null
+    var statusBarBackgroundType: String = "COLOR"
+    var statusBarBackgroundImage: String? = null
+    var statusBarBackgroundAlpha: Float = 1.0f
+    var statusBarHeightDp: Int = 0
+
+    var statusBarColorModeDark: String = "THEME"
+    var statusBarColorDark: String? = null
+    var statusBarDarkIconsDark: Boolean? = null
+    var statusBarBackgroundTypeDark: String = "COLOR"
+    var statusBarBackgroundImageDark: String? = null
+    var statusBarBackgroundAlphaDark: Float = 1.0f
+    var longPressMenuEnabled: Boolean = true
+    var longPressMenuStyle: String = "FULL"
+    var adBlockToggleEnabled: Boolean = false
+    var popupBlockerEnabled: Boolean = false
+    var popupBlockerToggleEnabled: Boolean = false
+    var openExternalLinks: Boolean = false
+
+
+    var initialScale: Int = 0
+    var viewportMode: String = "DEFAULT"
+    var customViewportWidth: Int = 0
+    var newWindowBehavior: String = "SAME_WINDOW"
+    var enablePaymentSchemes: Boolean = true
+    var enableShareBridge: Boolean = true
+    var enableZoomPolyfill: Boolean = true
+    var enableCrossOriginIsolation: Boolean = false
+    var hideUrlPreview: Boolean = false
+    var disableShields: Boolean = true
+    var decodeBase64DeepLinks: Boolean = false
+    var mediaAutoplayEnabled: Boolean = true
+    var acceptThirdPartyCookies: Boolean = true
+    var enableKernelDisguise: Boolean = true
+    var enableImageRepair: Boolean = true
+    var enableScrollMemory: Boolean = true
+    var enableHttpsUpgrade: Boolean = true
+    var enableOAuthExternalRedirect: Boolean = true
+    var enableClipboardPolyfill: Boolean = true
+    var enableNotificationPolyfill: Boolean = true
+    var safeBrowsingEnabled: Boolean = true
+    var geolocationEnabled: Boolean = true
+    var enableOrientationPolyfill: Boolean = true
+    var enableCompatPolyfills: Boolean = true
+    var enableNativeBridge: Boolean = true
+    var javaScriptCanOpenWindows: Boolean = true
+    var databaseEnabled: Boolean = true
+    var enableCookiePersistence: Boolean = true
+    var enablePrivateNetworkBridge: Boolean = true
+    var allowMixedContent: Boolean = true
+    var enableGpc: Boolean = true
+    var enableCookieConsentBlock: Boolean = true
+    var enableReferrerPolicy: Boolean = true
+    var enableTrackerBlocking: Boolean = true
+    var enableBlobDownloadInterception: Boolean = true
+    var keepScreenOn: Boolean = false
+    var screenAwakeMode: String = "OFF"
+    var screenAwakeTimeoutMinutes: Int = 30
+    var screenBrightness: Int = -1
+    var keyboardAdjustMode: String = "RESIZE"
+    var showFloatingBackButton: Boolean = false
+    var swipeRefreshEnabled: Boolean = true
+    var fullscreenEnabled: Boolean = true
+    var performanceOptimization: Boolean = false
+    var pwaOfflineEnabled: Boolean = false
+    var pwaOfflineStrategy: String = "NETWORK_FIRST"
+
+
+    var proxyMode: String = "NONE"
+    var proxyHost: String = ""
+    var proxyPort: Int = 0
+    var proxyType: String = "HTTP"
+    var pacUrl: String = ""
+    var proxyBypassRules: List<String> = emptyList()
+    var proxyUsername: String = ""
+    var proxyPassword: String = ""
+    var hostsMappingEnabled: Boolean = false
+    var hostsMappings: List<com.webtoapp.data.model.HostMappingEntry> = emptyList()
+
+
+    var dnsMode: String = "SYSTEM"
+    var dnsConfig: DnsApkConfig = DnsApkConfig()
+
+
+    var errorPageMode: String = "BUILTIN_STYLE"
+    var errorPageBuiltInStyle: String = "MATERIAL"
+    var errorPageShowMiniGame: Boolean = false
+    var errorPageMiniGameType: String = "RANDOM"
+    var errorPageAutoRetrySeconds: Int = 15
+    var errorPageCustomHtml: String = ""
+    var errorPageCustomMediaPath: String = ""
+    var errorPageRetryButtonText: String = ""
+
+
+    var floatingWindowEnabled: Boolean = false
+    var floatingWindowSizePercent: Int = 80
+    var floatingWindowWidthPercent: Int = 80
+    var floatingWindowHeightPercent: Int = 80
+    var floatingWindowLockAspectRatio: Boolean = true
+    var floatingWindowOpacity: Int = 100
+    var floatingWindowCornerRadius: Int = 16
+    var floatingWindowBorderStyle: String = "SUBTLE"
+    var floatingWindowShowTitleBar: Boolean = true
+    var floatingWindowAutoHideTitleBar: Boolean = false
+    var floatingWindowStartMinimized: Boolean = false
+    var floatingWindowRememberPosition: Boolean = true
+    var floatingWindowEdgeSnapping: Boolean = true
+    var floatingWindowShowResizeHandle: Boolean = true
+    var floatingWindowLockPosition: Boolean = false
+
+
+    var splashEnabled: Boolean = false
+    var splashType: String = "IMAGE"
+    var splashDuration: Int = 3
+    var splashClickToSkip: Boolean = true
+    var splashVideoStartMs: Long = 0
+    var splashVideoEndMs: Long = 5000
+    var splashLandscape: Boolean = false
+    var splashFillScreen: Boolean = true
+    var splashEnableAudio: Boolean = false
 
-
-    val appType: String = "WEB",
-    val mediaEnableAudio: Boolean = true,
-    val mediaLoop: Boolean = true,
-    val mediaAutoPlay: Boolean = true,
-    val mediaFillScreen: Boolean = true,
-    val mediaLandscape: Boolean = false,
-    val mediaKeepScreenOn: Boolean = true,
-
-
-    val htmlEntryFile: String = "index.html",
-    val htmlEnableJavaScript: Boolean = true,
-    val htmlEnableLocalStorage: Boolean = true,
-    val htmlLandscapeMode: Boolean = false,
-
-
-    val galleryItems: List<GalleryShellItemConfig> = emptyList(),
-    val galleryPlayMode: String = "SEQUENTIAL",
-    val galleryImageInterval: Int = 3,
-    val galleryLoop: Boolean = true,
-    val galleryAutoPlay: Boolean = false,
-    val galleryBackgroundColor: String = "#000000",
-    val galleryShowThumbnailBar: Boolean = true,
-    val galleryShowMediaInfo: Boolean = true,
-    val galleryOrientation: String = "PORTRAIT",
-    val galleryEnableAudio: Boolean = true,
-    val galleryVideoAutoNext: Boolean = true,
-    val galleryShuffleOnLoop: Boolean = false,
-    val galleryDefaultView: String = "GRID",
-    val galleryGridColumns: Int = 3,
-    val gallerySortOrder: String = "CUSTOM",
-    val galleryRememberPosition: Boolean = true,
-
-
-    val bgmEnabled: Boolean = false,
-    val bgmPlaylist: List<BgmShellItem> = emptyList(),
-    val bgmPlayMode: String = "LOOP",
-    val bgmVolume: Float = 0.5f,
-    val bgmAutoPlay: Boolean = true,
-    val bgmShowLyrics: Boolean = true,
-    val bgmLrcTheme: LrcShellTheme? = null,
-
-
-    val themeType: String = "AURORA",
-    val darkMode: String = "SYSTEM",
-
-
-    val translateEnabled: Boolean = false,
-    val translateTargetLanguage: String = "zh-CN",
-    val translateShowButton: Boolean = true,
-
-
-    val extensionEnabled: Boolean = false,
-    val extensionModuleIds: List<String> = emptyList(),
-    val embeddedExtensionModules: List<EmbeddedExtensionModule> = emptyList(),
-    val extensionFabIcon: String = "",
-
-
-    val autoStartEnabled: Boolean = false,
-    val bootStartEnabled: Boolean = false,
-    val scheduledStartEnabled: Boolean = false,
-    val scheduledTime: String = "08:00",
-    val scheduledDays: List<Int> = listOf(1, 2, 3, 4, 5, 6, 7),
-
-
-    val forcedRunConfig: ForcedRunConfig? = null,
-
-
-    val isolationEnabled: Boolean = false,
-    val isolationConfig: com.webtoapp.core.isolation.IsolationConfig? = null,
-
-
-    val backgroundRunEnabled: Boolean = false,
-    val backgroundRunConfig: BackgroundRunConfig? = null,
-
-
-    val notificationEnabled: Boolean = false,
-    val notificationConfig: NotificationConfig? = null,
-
-
-    val blackTechConfig: com.webtoapp.core.blacktech.BlackTechConfig? = null,
-
-
-    val disguiseConfig: com.webtoapp.core.disguise.DisguiseConfig? = null,
-
-
-    val browserDisguiseConfig: com.webtoapp.core.disguise.BrowserDisguiseConfig? = null,
-
-
-    val deviceDisguiseConfig: com.webtoapp.core.disguise.DeviceDisguiseConfig? = null,
-
-
-    val language: String = "CHINESE",
-
-
-    val engineType: String = "SYSTEM_WEBVIEW",
-
-
-    val deepLinkEnabled: Boolean = false,
-    val deepLinkHosts: List<String> = emptyList(),
-
-
-    val wordpressSiteTitle: String = "",
-    val wordpressAdminUser: String = "admin",
-    val wordpressAdminEmail: String = "",
-    val wordpressAdminPassword: String = "admin",
-    val wordpressThemeName: String = "",
-    val wordpressPlugins: List<String> = emptyList(),
-    val wordpressActivePlugins: List<String> = emptyList(),
-    val wordpressPermalinkStructure: String = "/%postname%/",
-    val wordpressSiteLanguage: String = "zh_CN",
-    val wordpressAutoInstall: Boolean = true,
-    val wordpressPhpPort: Int = 0,
-    val wordpressLandscapeMode: Boolean = false,
-
-
-    val nodejsMode: String = "STATIC",
-    val nodejsPort: Int = 0,
-    val nodejsEntryFile: String = "",
-    val nodejsEnvVars: Map<String, String> = emptyMap(),
-    val nodejsLandscapeMode: Boolean = false,
-
-
-    val phpAppFramework: String = "",
-    val phpAppDocumentRoot: String = "",
-    val phpAppEntryFile: String = "index.php",
-    val phpAppPort: Int = 0,
-    val phpAppEnvVars: Map<String, String> = emptyMap(),
-    val phpAppLandscapeMode: Boolean = false,
-
-
-    val pythonAppFramework: String = "",
-    val pythonAppEntryFile: String = "app.py",
-    val pythonAppEntryModule: String = "",
-    val pythonAppServerType: String = "builtin",
-    val pythonAppPort: Int = 0,
-    val pythonAppEnvVars: Map<String, String> = emptyMap(),
-    val pythonAppLandscapeMode: Boolean = false,
-
-
-    val goAppFramework: String = "",
-    val goAppBinaryName: String = "",
-    val goAppTargetArch: String = "arm64-v8a",
-    val goAppPort: Int = 0,
-    val goAppStaticDir: String = "",
-    val goAppEnvVars: Map<String, String> = emptyMap(),
-    val goAppLandscapeMode: Boolean = false,
-
-
-    val multiWebSites: List<com.webtoapp.core.shell.MultiWebSiteShellConfig> = emptyList(),
-    val multiWebDisplayMode: String = "TABS",
-    val multiWebRefreshInterval: Int = 30,
-    val multiWebShowSiteIcons: Boolean = true,
-    val multiWebLandscapeMode: Boolean = false,
-    val multiWebProjectId: String = ""
-)
-
+
+    var appType: String = "WEB"
+    var mediaEnableAudio: Boolean = true
+    var mediaLoop: Boolean = true
+    var mediaAutoPlay: Boolean = true
+    var mediaFillScreen: Boolean = true
+    var mediaLandscape: Boolean = false
+    var mediaKeepScreenOn: Boolean = true
+
+
+    var htmlEntryFile: String = "index.html"
+    var htmlEnableJavaScript: Boolean = true
+    var htmlEnableLocalStorage: Boolean = true
+    var htmlLandscapeMode: Boolean = false
+
+
+    var galleryItems: List<GalleryShellItemConfig> = emptyList()
+    var galleryPlayMode: String = "SEQUENTIAL"
+    var galleryImageInterval: Int = 3
+    var galleryLoop: Boolean = true
+    var galleryAutoPlay: Boolean = false
+    var galleryBackgroundColor: String = "#000000"
+    var galleryShowThumbnailBar: Boolean = true
+    var galleryShowMediaInfo: Boolean = true
+    var galleryOrientation: String = "PORTRAIT"
+    var galleryEnableAudio: Boolean = true
+    var galleryVideoAutoNext: Boolean = true
+    var galleryShuffleOnLoop: Boolean = false
+    var galleryDefaultView: String = "GRID"
+    var galleryGridColumns: Int = 3
+    var gallerySortOrder: String = "CUSTOM"
+    var galleryRememberPosition: Boolean = true
+
+
+    var bgmEnabled: Boolean = false
+    var bgmPlaylist: List<BgmShellItem> = emptyList()
+    var bgmPlayMode: String = "LOOP"
+    var bgmVolume: Float = 0.5f
+    var bgmAutoPlay: Boolean = true
+    var bgmShowLyrics: Boolean = true
+    var bgmLrcTheme: LrcShellTheme? = null
+
+
+    var themeType: String = "AURORA"
+    var darkMode: String = "SYSTEM"
+
+
+    var translateEnabled: Boolean = false
+    var translateTargetLanguage: String = "zh-CN"
+    var translateShowButton: Boolean = true
+
+
+    var extensionEnabled: Boolean = false
+    var extensionModuleIds: List<String> = emptyList()
+    var embeddedExtensionModules: List<EmbeddedExtensionModule> = emptyList()
+    var extensionFabIcon: String = ""
+
+
+    var autoStartEnabled: Boolean = false
+    var bootStartEnabled: Boolean = false
+    var scheduledStartEnabled: Boolean = false
+    var scheduledTime: String = "08:00"
+    var scheduledDays: List<Int> = listOf(1, 2, 3, 4, 5, 6, 7)
+
+
+    var forcedRunConfig: ForcedRunConfig? = null
+
+
+    var isolationEnabled: Boolean = false
+    var isolationConfig: com.webtoapp.core.isolation.IsolationConfig? = null
+
+
+    var backgroundRunEnabled: Boolean = false
+    var backgroundRunConfig: BackgroundRunConfig? = null
+
+
+    var notificationEnabled: Boolean = false
+    var notificationConfig: NotificationConfig? = null
+
+
+    var blackTechConfig: com.webtoapp.core.blacktech.BlackTechConfig? = null
+
+
+    var disguiseConfig: com.webtoapp.core.disguise.DisguiseConfig? = null
+
+
+    var browserDisguiseConfig: com.webtoapp.core.disguise.BrowserDisguiseConfig? = null
+
+
+    var deviceDisguiseConfig: com.webtoapp.core.disguise.DeviceDisguiseConfig? = null
+
+
+    var language: String = "CHINESE"
+
+
+    var engineType: String = "SYSTEM_WEBVIEW"
+
+
+    var deepLinkEnabled: Boolean = false
+    var deepLinkHosts: List<String> = emptyList()
+
+
+    var wordpressSiteTitle: String = ""
+    var wordpressAdminUser: String = "admin"
+    var wordpressAdminEmail: String = ""
+    var wordpressAdminPassword: String = "admin"
+    var wordpressThemeName: String = ""
+    var wordpressPlugins: List<String> = emptyList()
+    var wordpressActivePlugins: List<String> = emptyList()
+    var wordpressPermalinkStructure: String = "/%postname%/"
+    var wordpressSiteLanguage: String = "zh_CN"
+    var wordpressAutoInstall: Boolean = true
+    var wordpressPhpPort: Int = 0
+    var wordpressLandscapeMode: Boolean = false
+
+
+    var nodejsMode: String = "STATIC"
+    var nodejsPort: Int = 0
+    var nodejsEntryFile: String = ""
+    var nodejsEnvVars: Map<String, String> = emptyMap()
+    var nodejsLandscapeMode: Boolean = false
+
+
+    var phpAppFramework: String = ""
+    var phpAppDocumentRoot: String = ""
+    var phpAppEntryFile: String = "index.php"
+    var phpAppPort: Int = 0
+    var phpAppEnvVars: Map<String, String> = emptyMap()
+    var phpAppLandscapeMode: Boolean = false
+
+
+    var pythonAppFramework: String = ""
+    var pythonAppEntryFile: String = "app.py"
+    var pythonAppEntryModule: String = ""
+    var pythonAppServerType: String = "builtin"
+    var pythonAppPort: Int = 0
+    var pythonAppEnvVars: Map<String, String> = emptyMap()
+    var pythonAppLandscapeMode: Boolean = false
+
+
+    var goAppFramework: String = ""
+    var goAppBinaryName: String = ""
+    var goAppTargetArch: String = "arm64-v8a"
+    var goAppPort: Int = 0
+    var goAppStaticDir: String = ""
+    var goAppEnvVars: Map<String, String> = emptyMap()
+    var goAppLandscapeMode: Boolean = false
+
+
+    var multiWebSites: List<com.webtoapp.core.shell.MultiWebSiteShellConfig> = emptyList()
+    var multiWebDisplayMode: String = "TABS"
+    var multiWebRefreshInterval: Int = 30
+    var multiWebShowSiteIcons: Boolean = true
+    var multiWebLandscapeMode: Boolean = false
+    var multiWebProjectId: String = ""
+}
 
 
 

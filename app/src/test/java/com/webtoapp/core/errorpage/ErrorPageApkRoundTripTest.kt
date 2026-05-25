@@ -38,11 +38,11 @@ class ErrorPageApkRoundTripTest {
 
     @Test
     fun `customHtml survives full ApkConfig - JSON - shell pipeline`() {
-        val apkConfig = newApkConfig().copy(
-            errorPageMode = "CUSTOM_HTML",
-            errorPageCustomHtml = customHtml,
+        val apkConfig = newApkConfig().apply {
+            errorPageMode = "CUSTOM_HTML"
+            errorPageCustomHtml = customHtml
             errorPageRetryButtonText = "Try Again"
-        )
+        }
 
         val webViewBlock = extractWebViewConfig(apkConfig)
         val errorPageBlock = webViewBlock.getAsJsonObject("errorPageConfig")
@@ -62,11 +62,11 @@ class ErrorPageApkRoundTripTest {
     @Test
     fun `customMediaPath survives full ApkConfig - JSON - shell pipeline`() {
         val mediaPath = "/storage/emulated/0/MyApp/offline.mp4"
-        val apkConfig = newApkConfig().copy(
-            errorPageMode = "CUSTOM_MEDIA",
-            errorPageCustomMediaPath = mediaPath,
+        val apkConfig = newApkConfig().apply {
+            errorPageMode = "CUSTOM_MEDIA"
+            errorPageCustomMediaPath = mediaPath
             errorPageRetryButtonText = "Reload"
-        )
+        }
 
         val errorPageBlock = extractWebViewConfig(apkConfig).getAsJsonObject("errorPageConfig")
         assertThat(errorPageBlock.get("customMediaPath").asString).isEqualTo(mediaPath)
@@ -116,10 +116,11 @@ class ErrorPageApkRoundTripTest {
     private fun newApkConfig(): ApkConfig = ApkConfig(
         appName = "OfflineFixtureApp",
         packageName = "com.example.test",
-        targetUrl = "https://offline.test/",
-        versionCode = 1,
+        targetUrl = "https://offline.test/"
+    ).apply {
+        versionCode = 1
         versionName = "1.0"
-    )
+    }
 
     private fun extractWebViewConfig(config: ApkConfig): JsonObject {
         val json = ApkConfigJsonFactory.create(config)
