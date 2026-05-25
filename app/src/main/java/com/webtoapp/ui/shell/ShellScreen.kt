@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.webtoapp.WebToAppApplication
 import com.webtoapp.core.logging.AppLogger
 import com.webtoapp.core.shell.ShellConfig
+import com.webtoapp.core.webview.ColorThemeBridge
 import com.webtoapp.core.webview.LongPressHandler
 import com.webtoapp.core.i18n.Strings
 import com.webtoapp.data.model.Announcement
@@ -294,6 +295,25 @@ fun ShellScreen(
     val bgmState = rememberBgmPlayerState(context, config)
 
     var webPageThemeColor by remember { mutableStateOf<String?>(null) }
+    val hideToolbar = config.webViewConfig.hideToolbar
+    val showStatusBarInFullscreen = config.webViewConfig.showStatusBarInFullscreen
+    val isDarkThemeForStatusBar = com.webtoapp.ui.theme.LocalIsDarkTheme.current
+    val installWebPageColorBridge = config.shouldInstallWebPageColorBridge()
+    val useWebPageStatusBarColor = config.shouldApplyWebPageStatusBarColor(isDarkThemeForStatusBar)
+    val colorThemeBridge = remember {
+        ColorThemeBridge(
+            onColorChanged = { color -> webPageThemeColor = color },
+            onColorCleared = { }
+        )
+    }
+    val handleWebViewCreated = remember(onWebViewCreated, installWebPageColorBridge) {
+        { webView: WebView ->
+            if (installWebPageColorBridge) {
+                webView.addJavascriptInterface(colorThemeBridge, ColorThemeBridge.JS_INTERFACE_NAME)
+            }
+            onWebViewCreated(webView)
+        }
+    }
 
     val webViewCallbacks = remember {
         createShellWebViewCallbacks(
@@ -319,7 +339,10 @@ fun ShellScreen(
                 longPressTouchY = y
                 showLongPressMenu = true
             },
-            onWebPageThemeColor = { color -> webPageThemeColor = color }
+            onWebPageThemeColor = { color -> webPageThemeColor = color },
+            startWebPageThemeTracking = { view, url ->
+                startWebPageStatusBarColorTracking(view, colorThemeBridge, url)
+            }
         )
     }
 
@@ -330,8 +353,6 @@ fun ShellScreen(
         com.webtoapp.core.webview.WebViewManager(context, adBlocker)
     }
 
-
-    val hideToolbar = config.webViewConfig.hideToolbar
 
     val hideBrowserToolbar = config.webViewConfig.hideBrowserToolbar
 
@@ -384,7 +405,7 @@ fun ShellScreen(
         swipeRefreshEnabled = swipeRefreshEnabled,
         isRefreshing = isRefreshing,
         onRefresh = { isRefreshing = false },
-        onWebViewCreated = onWebViewCreated,
+        onWebViewCreated = handleWebViewCreated,
         onWebViewRefUpdated = { webViewRef = it },
         onShowActivationDialog = { showActivationDialog = true },
         onErrorDismiss = { errorMessage = null },
@@ -471,51 +492,52 @@ fun ShellScreen(
 
     val isDarkTheme = com.webtoapp.ui.theme.LocalIsDarkTheme.current
 
-    LaunchedEffect(webPageThemeColor) {
-        val color = webPageThemeColor
-        if (color != null) {
-            val effectiveMode = if (isDarkTheme) config.webViewConfig.statusBarColorModeDark else config.webViewConfig.statusBarColorMode
-            if (effectiveMode == "WEB_PAGE" && hideToolbar && config.webViewConfig.showStatusBarInFullscreen) {
-                try {
-                    val parsedColor = android.graphics.Color.parseColor(color)
-                    activity.window.statusBarColor = parsedColor
-                    val luminance = (0.299 * android.graphics.Color.red(parsedColor) +
-                        0.587 * android.graphics.Color.green(parsedColor) +
-                        0.114 * android.graphics.Color.blue(parsedColor)) / 255.0
-                    val controller = WindowInsetsControllerCompat(activity.window, activity.window.decorView)
-                    controller.isAppearanceLightStatusBars = luminance > 0.5
-                } catch (e: Exception) {
-                    AppLogger.w("ShellScreen", "Failed to apply webpage theme color: $color", e)
-                }
-            }
+    LaunchedEffect(webPageThemeColor, useWebPageStatusBarColor, isDarkTheme) {
+        if (!useWebPageStatusBarColor) return@LaunchedEffect
+        (activity as? ShellActivity)?.syncWebPageStatusBarColor(webPageThemeColor)
+        val color = webPageThemeColor ?: return@LaunchedEffect
+        try {
+            val parsedColor = android.graphics.Color.parseColor(color)
+            activity.window.statusBarColor = parsedColor
+            val luminance = (0.299 * android.graphics.Color.red(parsedColor) +
+                0.587 * android.graphics.Color.green(parsedColor) +
+                0.114 * android.graphics.Color.blue(parsedColor)) / 255.0
+            val controller = WindowInsetsControllerCompat(activity.window, activity.window.decorView)
+            controller.isAppearanceLightStatusBars = luminance > 0.5
+            AppLogger.d("ShellScreen", "应用网页状态栏颜色: $color")
+        } catch (e: Exception) {
+            AppLogger.w("ShellScreen", "Failed to apply webpage theme color: $color", e)
         }
     }
 
-    val effectiveMode = if (isDarkTheme) config.webViewConfig.statusBarColorModeDark else config.webViewConfig.statusBarColorMode
     val effectiveBgType = if (isDarkTheme) statusBarBackgroundTypeDark else statusBarBackgroundType
-    val effectiveBgColor = if (effectiveMode == "WEB_PAGE" && webPageThemeColor != null && hideToolbar && config.webViewConfig.showStatusBarInFullscreen) {
-        webPageThemeColor
-    } else {
-        if (isDarkTheme) statusBarBackgroundColorDark else statusBarBackgroundColor
+    val effectiveBgColor = when {
+        useWebPageStatusBarColor && webPageThemeColor != null -> webPageThemeColor
+        useWebPageStatusBarColor -> null
+        else -> if (isDarkTheme) statusBarBackgroundColorDark else statusBarBackgroundColor
     }
     val effectiveBgImage = if (isDarkTheme) statusBarBackgroundImageDark else statusBarBackgroundImage
     val effectiveBgAlpha = if (isDarkTheme) statusBarBackgroundAlphaDark else statusBarBackgroundAlpha
-    val showOverlay = (hideToolbar && config.webViewConfig.showStatusBarInFullscreen) ||
-            (!hideToolbar && (effectiveBgType != "COLOR" || effectiveBgColor != null))
+    val showOverlay = when {
+        useWebPageStatusBarColor && webPageThemeColor != null -> hideToolbar && showStatusBarInFullscreen
+        useWebPageStatusBarColor -> false
+        hideToolbar && showStatusBarInFullscreen -> true
+        else -> !hideToolbar && (effectiveBgType != "COLOR" || effectiveBgColor != null)
+    }
     if (showOverlay) {
         com.webtoapp.ui.components.StatusBarOverlay(
             show = true,
-            backgroundType = if (effectiveMode == "WEB_PAGE") "COLOR" else effectiveBgType,
+            backgroundType = if (useWebPageStatusBarColor) "COLOR" else effectiveBgType,
             backgroundColor = effectiveBgColor,
-            backgroundImagePath = if (effectiveMode == "WEB_PAGE") null else effectiveBgImage,
-            alpha = if (effectiveMode == "WEB_PAGE") 1f else effectiveBgAlpha,
+            backgroundImagePath = if (useWebPageStatusBarColor) null else effectiveBgImage,
+            alpha = if (useWebPageStatusBarColor) 1f else effectiveBgAlpha,
             heightDp = statusBarHeightDp,
             modifier = Modifier.align(Alignment.TopStart)
         )
 
         val view = activity.window.decorView
         val insetsController = androidx.core.view.WindowInsetsControllerCompat(activity.window, view)
-        val isLightOverlay = if (effectiveMode == "WEB_PAGE" && effectiveBgColor != null) {
+        val isLightOverlay = if (useWebPageStatusBarColor && effectiveBgColor != null) {
             try {
                 val color = android.graphics.Color.parseColor(effectiveBgColor)
                 val luminance = (0.299 * android.graphics.Color.red(color) +

@@ -54,7 +54,7 @@ android {
     defaultConfig {
         applicationId = "com.webtoapp"
         minSdk = 23
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 33
         versionName = "1.9.6"
         buildConfigField("boolean", "SHELL_RUNTIME_ONLY", "false")

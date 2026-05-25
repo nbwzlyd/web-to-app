@@ -85,8 +85,29 @@ class ShellActivity : AppCompatActivity() {
         isDarkTheme: Boolean
     ) = WindowHelper.applyStatusBarColor(this, colorMode, customColor, darkIcons, isDarkTheme)
 
+    private var webPageStatusBarColor: String? = null
+
+    fun syncWebPageStatusBarColor(color: String?) {
+        webPageStatusBarColor = color
+        val configuredMode = if (currentIsDarkTheme) statusBarColorModeDark else statusBarColorMode
+        if (immersiveFullscreenEnabled && showStatusBarInFullscreen && configuredMode == "WEB_PAGE") {
+            applyImmersiveFullscreen(true, isDarkTheme = currentIsDarkTheme)
+        }
+    }
+
     private fun applyImmersiveFullscreen(enabled: Boolean, hideNavBar: Boolean? = null, isDarkTheme: Boolean = false) {
         val shouldHideNavBar = hideNavBar ?: !showNavigationBarInFullscreen
+        val configuredMode = if (isDarkTheme) statusBarColorModeDark else statusBarColorMode
+        val configuredCustomColor = if (isDarkTheme) statusBarCustomColorDark else statusBarCustomColor
+        val useWebPageColor = enabled && showStatusBarInFullscreen && configuredMode == "WEB_PAGE"
+        val effectiveColorMode = when {
+            useWebPageColor -> "WEB_PAGE"
+            else -> configuredMode
+        }
+        val effectiveCustomColor = when {
+            useWebPageColor -> webPageStatusBarColor
+            else -> configuredCustomColor
+        }
         WindowHelper.applyImmersiveFullscreen(
             activity = this,
             enabled = enabled,
@@ -94,8 +115,8 @@ class ShellActivity : AppCompatActivity() {
             isDarkTheme = isDarkTheme,
             showStatusBar = showStatusBarInFullscreen,
             forceHideSystemUi = forceHideSystemUi,
-            statusBarColorMode = statusBarColorMode,
-            statusBarCustomColor = statusBarCustomColor,
+            statusBarColorMode = effectiveColorMode,
+            statusBarCustomColor = effectiveCustomColor,
             statusBarDarkIcons = statusBarDarkIcons,
             statusBarBgType = statusBarBackgroundType,
             keyboardAdjustMode = keyboardAdjustMode,

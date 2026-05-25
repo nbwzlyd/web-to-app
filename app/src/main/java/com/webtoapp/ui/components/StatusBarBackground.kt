@@ -16,6 +16,21 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import java.io.File
 
+private fun parseStatusBarComposeColor(backgroundColor: String?, overlayAlpha: Float): Color? {
+    if (backgroundColor.isNullOrBlank()) return null
+    val trimmed = backgroundColor.trim()
+    if (trimmed.equals("transparent", ignoreCase = true)) return Color.Transparent
+    return try {
+        val argb = android.graphics.Color.parseColor(trimmed)
+        if (android.graphics.Color.alpha(argb) == 0) return Color.Transparent
+        val base = Color(argb)
+        // 8 位 #AARRGGBB 已含透明度，不再叠加 overlayAlpha，避免 #00000000 变成不透明黑
+        if (trimmed.removePrefix("#").length == 8) base else base.copy(alpha = overlayAlpha)
+    } catch (_: Exception) {
+        null
+    }
+}
+
 
 
 
@@ -88,22 +103,14 @@ fun StatusBarBackground(
                 )
             }
             else -> {
-
-                val bgColor = try {
-                    val hex = backgroundColor?.removePrefix("#") ?: "000000"
-                    when (hex.length) {
-                        6 -> Color(android.graphics.Color.parseColor("#$hex")).copy(alpha = alpha)
-                        8 -> Color(android.graphics.Color.parseColor("#$hex")).copy(alpha = alpha)
-                        else -> Color.Black.copy(alpha = alpha)
-                    }
-                } catch (e: Exception) {
-                    Color.Black.copy(alpha = alpha)
+                val bgColor = parseStatusBarComposeColor(backgroundColor, alpha)
+                if (bgColor != null && bgColor != Color.Transparent) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(bgColor)
+                    )
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(bgColor)
-                )
             }
         }
     }
@@ -184,22 +191,14 @@ fun StatusBarOverlay(
                 )
             }
             else -> {
-
-                val bgColor = try {
-                    val hex = backgroundColor?.removePrefix("#") ?: "000000"
-                    when (hex.length) {
-                        6 -> Color(android.graphics.Color.parseColor("#$hex")).copy(alpha = alpha)
-                        8 -> Color(android.graphics.Color.parseColor("#$hex")).copy(alpha = alpha)
-                        else -> Color.Black.copy(alpha = alpha)
-                    }
-                } catch (e: Exception) {
-                    Color.Black.copy(alpha = alpha)
+                val bgColor = parseStatusBarComposeColor(backgroundColor, alpha)
+                if (bgColor != null && bgColor != Color.Transparent) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(bgColor)
+                    )
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(bgColor)
-                )
             }
         }
     }

@@ -15,6 +15,7 @@ import com.webtoapp.core.i18n.Strings
 import com.webtoapp.core.shell.ShellConfig
 import com.webtoapp.core.webview.LongPressHandler
 import com.webtoapp.core.webview.WebViewCallbacks
+import com.webtoapp.core.webview.ColorThemeBridge
 
 private fun isLocalRuntimeShellUrl(url: String?): Boolean {
     if (url.isNullOrBlank()) return false
@@ -45,14 +46,30 @@ fun createShellWebViewCallbacks(
     updateWebViewRef: (WebView?) -> Unit,
     notifyRecreationKeyIncrement: () -> Unit,
     notifyLongPressMenu: (LongPressHandler.LongPressResult, Float, Float) -> Unit,
-    onWebPageThemeColor: ((String) -> Unit)? = null
+    onWebPageThemeColor: ((String?) -> Unit)? = null,
+    startWebPageThemeTracking: ((WebView, String?) -> Unit)? = null
 ): WebViewCallbacks {
     return object : WebViewCallbacks {
         override fun onPageStarted(url: String?) {
             if (url == "about:blank") return
             updateLoading(true)
             updateUrl(url ?: "")
+            if (!isLocalRuntimeShellUrl(url) && config.shouldInstallWebPageColorBridge()) {
+                webViewRefProvider()?.let { ColorThemeBridge.scheduleColorExtractMeta(it) }
+            }
             com.webtoapp.core.shell.ShellLogger.logWebView("开始加载", url ?: "")
+        }
+
+        override fun onPageCommitVisible(url: String?) {
+            if (url == "about:blank" || isLocalRuntimeShellUrl(url)) return
+            if (!config.shouldInstallWebPageColorBridge()) return
+            webViewRefProvider()?.let { view ->
+                if (startWebPageThemeTracking != null) {
+                    startWebPageThemeTracking.invoke(view, url)
+                } else {
+                    ColorThemeBridge.scheduleColorExtract(view)
+                }
+            }
         }
 
         override fun onUrlChanged(webView: WebView?, url: String?) {
@@ -85,19 +102,11 @@ fun createShellWebViewCallbacks(
                 }
 
 
-                val isWebPageMode = config.webViewConfig.statusBarColorMode == "WEB_PAGE" ||
-                    config.webViewConfig.statusBarColorModeDark == "WEB_PAGE"
-                if (!isLocalRuntimePage && isWebPageMode) {
-                    it.evaluateJavascript("""
-                        (function() {
-                            var meta = document.querySelector('meta[name="theme-color"]');
-                            return meta ? meta.getAttribute('content') : '';
-                        })()
-                    """.trimIndent()) { result ->
-                        if (!result.isNullOrBlank() && result != "null" && result.length > 2) {
-                            val color = result.substring(1, result.length - 1)
-                            onWebPageThemeColor?.invoke(color)
-                        }
+                if (!isLocalRuntimePage && config.shouldInstallWebPageColorBridge()) {
+                    if (startWebPageThemeTracking != null) {
+                        startWebPageThemeTracking.invoke(it, url)
+                    } else {
+                        ColorThemeBridge.scheduleColorExtract(it)
                     }
                 }
 
@@ -107,6 +116,11 @@ fun createShellWebViewCallbacks(
 
         override fun onProgressChanged(progress: Int) {
             updateProgress(progress)
+            if (progress == 15 || progress == 40) {
+                if (config.shouldInstallWebPageColorBridge()) {
+                    webViewRefProvider()?.let { ColorThemeBridge.scheduleColorExtractMeta(it) }
+                }
+            }
         }
 
         override fun onTitleChanged(title: String?) {

@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.webtoapp.ui.components.EdgeSwipeRefreshLayout
 import com.webtoapp.WebToAppApplication
@@ -51,6 +52,7 @@ import com.webtoapp.core.webview.LocalHttpServer
 import com.webtoapp.core.webview.LongPressHandler
 import com.webtoapp.core.webview.WebViewCallbacks
 import com.webtoapp.core.webview.WebViewManager
+import com.webtoapp.core.webview.ColorThemeBridge
 import com.webtoapp.core.i18n.Strings
 import com.webtoapp.data.model.KeyboardAdjustMode
 import com.webtoapp.data.model.LongPressMenuStyle
@@ -66,6 +68,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import com.webtoapp.ui.shared.WindowHelper
 import com.webtoapp.ui.shell.ShellWebViewNavigation
+import com.webtoapp.ui.shell.shouldApplyWebPageStatusBarColor
+import com.webtoapp.ui.shell.shouldInstallWebPageColorBridge
+import com.webtoapp.ui.shell.startWebPageStatusBarColorTracking
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 import com.webtoapp.core.wordpress.WordPressDependencyManager
@@ -158,16 +163,39 @@ class WebViewActivity : AppCompatActivity() {
         isDarkTheme: Boolean
     ) = WindowHelper.applyStatusBarColor(this, colorMode.name, customColor, darkIcons, isDarkTheme)
 
+    private var webPageStatusBarColor: String? = null
+
+    fun syncWebPageStatusBarColor(color: String?, isDarkTheme: Boolean) {
+        webPageStatusBarColor = color
+        val configuredMode = if (isDarkTheme) statusBarColorModeDark else statusBarColorMode
+        if (immersiveFullscreenEnabled && showStatusBarInFullscreen &&
+            configuredMode == com.webtoapp.data.model.StatusBarColorMode.WEB_PAGE
+        ) {
+            applyImmersiveFullscreen(true, isDarkTheme = isDarkTheme)
+        }
+    }
+
     private fun applyImmersiveFullscreen(enabled: Boolean, hideNavBar: Boolean? = null, isDarkTheme: Boolean = false) {
         val shouldHideNavBar = hideNavBar ?: !showNavigationBarInFullscreen
+        val configuredMode = if (isDarkTheme) statusBarColorModeDark else statusBarColorMode
+        val configuredCustomColor = if (isDarkTheme) statusBarCustomColorDark else statusBarCustomColor
+        val useWebPageColor = enabled && showStatusBarInFullscreen && configuredMode == com.webtoapp.data.model.StatusBarColorMode.WEB_PAGE
+        val effectiveColorMode = when {
+            useWebPageColor -> "WEB_PAGE"
+            else -> configuredMode.name
+        }
+        val effectiveCustomColor = when {
+            useWebPageColor -> webPageStatusBarColor
+            else -> configuredCustomColor
+        }
         WindowHelper.applyImmersiveFullscreen(
             activity = this,
             enabled = enabled,
             hideNavBar = shouldHideNavBar,
             isDarkTheme = isDarkTheme,
             showStatusBar = showStatusBarInFullscreen,
-            statusBarColorMode = statusBarColorMode.name,
-            statusBarCustomColor = statusBarCustomColor,
+            statusBarColorMode = effectiveColorMode,
+            statusBarCustomColor = effectiveCustomColor,
             statusBarDarkIcons = statusBarDarkIcons,
             statusBarBgType = statusBarBackgroundType.name,
             keyboardAdjustMode = keyboardAdjustMode,
@@ -817,6 +845,14 @@ fun WebViewScreen(
 
 
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
+
+    var webPageThemeColor by remember { mutableStateOf<String?>(null) }
+    val colorThemeBridge = remember {
+        ColorThemeBridge(
+            onColorChanged = { webPageThemeColor = it },
+            onColorCleared = { webPageThemeColor = null }
+        )
+    }
 
 
     val jsScrollTop = remember { AtomicInteger(0) }
@@ -1913,10 +1949,28 @@ fun WebViewScreen(
                 } else {
                     scheduleStrictHostFallbackProbe(url, "page_started", 5500L)
                 }
+                webApp?.webViewConfig?.let { cfg ->
+                    if (cfg.shouldInstallWebPageColorBridge() &&
+                        url != null &&
+                        !url.startsWith("http://127.0.0.1:", ignoreCase = true) &&
+                        !url.startsWith("http://localhost:", ignoreCase = true)
+                    ) {
+                        webViewRef?.let { ColorThemeBridge.scheduleColorExtractMeta(it) }
+                    }
+                }
             }
 
             override fun onPageCommitVisible(url: String?) {
                 scheduleStrictHostFallbackProbe(url, "commit_visible", 2200L)
+                webApp?.webViewConfig?.let { cfg ->
+                    if (cfg.shouldInstallWebPageColorBridge() &&
+                        url != null &&
+                        !url.startsWith("http://127.0.0.1:", ignoreCase = true) &&
+                        !url.startsWith("http://localhost:", ignoreCase = true)
+                    ) {
+                        webViewRef?.let { startWebPageStatusBarColorTracking(it, colorThemeBridge, url) }
+                    }
+                }
             }
 
             override fun onUrlChanged(webView: WebView?, url: String?) {
@@ -1962,12 +2016,29 @@ fun WebViewScreen(
                     } else {
                         AppLogger.d("WebViewActivity", "Skip long-press enhancer for strict compatibility host: $url")
                     }
+
+                    webApp?.webViewConfig?.let { cfg ->
+                        if (cfg.shouldInstallWebPageColorBridge() &&
+                            url != null &&
+                            !url.startsWith("http://127.0.0.1:", ignoreCase = true) &&
+                            !url.startsWith("http://localhost:", ignoreCase = true)
+                        ) {
+                            startWebPageStatusBarColorTracking(it, colorThemeBridge, url)
+                        }
+                    }
                 }
                 scheduleStrictHostFallbackProbe(url, "page_finished", 1200L)
             }
 
             override fun onProgressChanged(progress: Int) {
                 loadProgress = progress
+                if (progress == 15 || progress == 40) {
+                    webApp?.webViewConfig?.let { cfg ->
+                        if (cfg.shouldInstallWebPageColorBridge()) {
+                            webViewRef?.let { ColorThemeBridge.scheduleColorExtractMeta(it) }
+                        }
+                    }
+                }
             }
 
             override fun onTitleChanged(title: String?) {
@@ -2339,6 +2410,28 @@ fun WebViewScreen(
 
 
     val hideToolbar = !isTestMode && webApp?.webViewConfig?.hideToolbar == true
+
+    val isDarkTheme = com.webtoapp.ui.theme.LocalIsDarkTheme.current
+    val installWebPageColorBridge = webApp?.webViewConfig?.shouldInstallWebPageColorBridge() == true
+    val useWebPageStatusBarColor = webApp?.webViewConfig?.shouldApplyWebPageStatusBarColor(isDarkTheme) == true
+
+    LaunchedEffect(webPageThemeColor, useWebPageStatusBarColor) {
+        if (!useWebPageStatusBarColor) return@LaunchedEffect
+        (activity as? WebViewActivity)?.syncWebPageStatusBarColor(webPageThemeColor, isDarkTheme)
+        val color = webPageThemeColor ?: return@LaunchedEffect
+        try {
+            val parsedColor = android.graphics.Color.parseColor(color)
+            activity.window.statusBarColor = parsedColor
+            val luminance = (0.299 * android.graphics.Color.red(parsedColor) +
+                0.587 * android.graphics.Color.green(parsedColor) +
+                0.114 * android.graphics.Color.blue(parsedColor)) / 255.0
+            WindowInsetsControllerCompat(activity.window, activity.window.decorView)
+                .isAppearanceLightStatusBars = luminance > 0.5
+            AppLogger.d("WebViewActivity", "应用网页状态栏颜色: $color")
+        } catch (e: Exception) {
+            AppLogger.w("WebViewActivity", "Failed to apply webpage theme color: $color", e)
+        }
+    }
 
     val hideBrowserToolbar = !isTestMode && webApp?.webViewConfig?.hideBrowserToolbar == true
 
@@ -2716,6 +2809,11 @@ fun WebViewScreen(
                                     }
 
                                     addJavascriptInterface(scrollBridge, "_wtaScrollBridge")
+                                    webApp?.webViewConfig?.let { cfg ->
+                                        if (cfg.shouldInstallWebPageColorBridge()) {
+                                            addJavascriptInterface(colorThemeBridge, ColorThemeBridge.JS_INTERFACE_NAME)
+                                        }
+                                    }
                                     onWebViewCreated(this)
 
                                     if (shouldSkipLongPressEnhancer(targetUrl)) {
@@ -2909,13 +3007,22 @@ fun WebViewScreen(
 
 
 
-    if (hideToolbar && webApp?.webViewConfig?.showStatusBarInFullscreen == true) {
+    if (hideToolbar && webApp?.webViewConfig?.showStatusBarInFullscreen == true &&
+        (!useWebPageStatusBarColor || webPageThemeColor != null)
+    ) {
+        val overlayColor = when {
+            useWebPageStatusBarColor -> webPageThemeColor
+            else -> statusBarBackgroundColor
+        }
+        val overlayType = if (useWebPageStatusBarColor) "COLOR" else statusBarBackgroundType
+        val overlayImage = if (useWebPageStatusBarColor) null else statusBarBackgroundImage
+        val overlayAlpha = if (useWebPageStatusBarColor) 1f else statusBarBackgroundAlpha
         com.webtoapp.ui.components.StatusBarOverlay(
             show = true,
-            backgroundType = statusBarBackgroundType,
-            backgroundColor = statusBarBackgroundColor,
-            backgroundImagePath = statusBarBackgroundImage,
-            alpha = statusBarBackgroundAlpha,
+            backgroundType = overlayType,
+            backgroundColor = overlayColor,
+            backgroundImagePath = overlayImage,
+            alpha = overlayAlpha,
             heightDp = statusBarHeightDp,
             modifier = Modifier.align(Alignment.TopStart)
         )
