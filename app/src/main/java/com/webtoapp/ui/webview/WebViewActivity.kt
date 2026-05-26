@@ -176,7 +176,8 @@ class WebViewActivity : AppCompatActivity() {
     }
 
     private fun applyImmersiveFullscreen(enabled: Boolean, hideNavBar: Boolean? = null, isDarkTheme: Boolean = false) {
-        val shouldHideNavBar = hideNavBar ?: !showNavigationBarInFullscreen
+        val shouldForceHideSystemUi = customView != null
+        val shouldHideNavBar = if (shouldForceHideSystemUi) true else hideNavBar ?: !showNavigationBarInFullscreen
         val configuredMode = if (isDarkTheme) statusBarColorModeDark else statusBarColorMode
         val configuredCustomColor = if (isDarkTheme) statusBarCustomColorDark else statusBarCustomColor
         val useWebPageColor = enabled && showStatusBarInFullscreen && configuredMode == com.webtoapp.data.model.StatusBarColorMode.WEB_PAGE
@@ -194,6 +195,7 @@ class WebViewActivity : AppCompatActivity() {
             hideNavBar = shouldHideNavBar,
             isDarkTheme = isDarkTheme,
             showStatusBar = showStatusBarInFullscreen,
+            forceHideSystemUi = shouldForceHideSystemUi,
             statusBarColorMode = effectiveColorMode,
             statusBarCustomColor = effectiveCustomColor,
             statusBarDarkIcons = statusBarDarkIcons,

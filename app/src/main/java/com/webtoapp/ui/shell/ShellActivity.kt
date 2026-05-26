@@ -96,7 +96,8 @@ class ShellActivity : AppCompatActivity() {
     }
 
     private fun applyImmersiveFullscreen(enabled: Boolean, hideNavBar: Boolean? = null, isDarkTheme: Boolean = false) {
-        val shouldHideNavBar = hideNavBar ?: !showNavigationBarInFullscreen
+        val shouldForceHideSystemUi = forceHideSystemUi || customView != null
+        val shouldHideNavBar = if (shouldForceHideSystemUi) true else hideNavBar ?: !showNavigationBarInFullscreen
         val configuredMode = if (isDarkTheme) statusBarColorModeDark else statusBarColorMode
         val configuredCustomColor = if (isDarkTheme) statusBarCustomColorDark else statusBarCustomColor
         val useWebPageColor = enabled && showStatusBarInFullscreen && configuredMode == "WEB_PAGE"
@@ -114,7 +115,7 @@ class ShellActivity : AppCompatActivity() {
             hideNavBar = shouldHideNavBar,
             isDarkTheme = isDarkTheme,
             showStatusBar = showStatusBarInFullscreen,
-            forceHideSystemUi = forceHideSystemUi,
+            forceHideSystemUi = shouldForceHideSystemUi,
             statusBarColorMode = effectiveColorMode,
             statusBarCustomColor = effectiveCustomColor,
             statusBarDarkIcons = statusBarDarkIcons,
