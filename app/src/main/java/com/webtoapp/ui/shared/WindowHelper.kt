@@ -388,16 +388,17 @@ object WindowHelper {
 
 
 
-        val isVideoView = view is android.view.SurfaceView ||
-                          view is android.view.TextureView ||
-                          (view is ViewGroup && hasVideoChildView(view))
-
-        if (isVideoView) {
+        // 网页通过 HTML5 Fullscreen API 进入全屏（视频/游戏/沉浸式内容）时，
+        // 现代 WebView 不一定把 SurfaceView/TextureView 暴露给 onShowCustomView
+        // （视频常通过 GL 渲染到 WebView 自身的 surface），仅依赖类型探测会
+        // 导致竖屏页面进入全屏后无法横屏。这里改为：若当前不在横屏家族中，
+        // 统一切到 SENSOR_LANDSCAPE，退出全屏时再恢复原方向，这是 Chrome
+        // 等浏览器的通用做法。
+        if (!isLandscapeOrientation(originalOrientation)) {
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            AppLogger.d("WindowHelper", "Video fullscreen: switching to SENSOR_LANDSCAPE")
+            AppLogger.d("WindowHelper", "Fullscreen: switching to SENSOR_LANDSCAPE (was $originalOrientation)")
         } else {
-
-            AppLogger.d("WindowHelper", "Non-video fullscreen: keeping current orientation ($originalOrientation)")
+            AppLogger.d("WindowHelper", "Fullscreen: already landscape, keep orientation ($originalOrientation)")
         }
 
         val decorView = activity.window.decorView as FrameLayout
@@ -415,17 +416,11 @@ object WindowHelper {
 
 
 
-    private fun hasVideoChildView(parent: ViewGroup): Boolean {
-        for (i in 0 until parent.childCount) {
-            val child = parent.getChildAt(i)
-            if (child is android.view.SurfaceView || child is android.view.TextureView) {
-                return true
-            }
-            if (child is ViewGroup && hasVideoChildView(child)) {
-                return true
-            }
-        }
-        return false
+    private fun isLandscapeOrientation(orientation: Int): Boolean {
+        return orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
     }
 
 
