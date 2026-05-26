@@ -384,6 +384,7 @@ object WindowHelper {
         view: View
     ): Int {
         val originalOrientation = activity.requestedOrientation
+        val restoreOrientation = resolveFullscreenRestoreOrientation(activity, originalOrientation)
 
 
 
@@ -396,9 +397,9 @@ object WindowHelper {
         // 等浏览器的通用做法。
         if (!isLandscapeOrientation(originalOrientation)) {
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            AppLogger.d("WindowHelper", "Fullscreen: switching to SENSOR_LANDSCAPE (was $originalOrientation)")
+            AppLogger.d("WindowHelper", "Fullscreen: switching to SENSOR_LANDSCAPE (was $originalOrientation, restore=$restoreOrientation)")
         } else {
-            AppLogger.d("WindowHelper", "Fullscreen: already landscape, keep orientation ($originalOrientation)")
+            AppLogger.d("WindowHelper", "Fullscreen: already landscape, keep orientation ($originalOrientation, restore=$restoreOrientation)")
         }
 
         val decorView = activity.window.decorView as FrameLayout
@@ -409,12 +410,35 @@ object WindowHelper {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         )
-        return originalOrientation
+        return restoreOrientation
     }
 
 
 
 
+
+    private fun resolveFullscreenRestoreOrientation(activity: Activity, requestedOrientation: Int): Int {
+        if (isFixedOrientation(requestedOrientation)) {
+            return requestedOrientation
+        }
+
+        return when (activity.resources.configuration.orientation) {
+            android.content.res.Configuration.ORIENTATION_LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            android.content.res.Configuration.ORIENTATION_PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            else -> requestedOrientation
+        }
+    }
+
+    private fun isFixedOrientation(orientation: Int): Boolean {
+        return orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
+    }
 
     private fun isLandscapeOrientation(orientation: Int): Boolean {
         return orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ||
