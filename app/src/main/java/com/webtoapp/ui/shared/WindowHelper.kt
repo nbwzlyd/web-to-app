@@ -410,6 +410,22 @@ object WindowHelper {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         )
+
+        // 网页 H5 Fullscreen 应该是真沉浸：忽略「全屏仍显示状态栏/导航栏」
+        // 等用户配置，强制隐藏所有系统栏。退出全屏时由 Activity 重新调用
+        // applyImmersiveFullscreen 恢复到用户原配置。
+        try {
+            WindowCompat.setDecorFitsSystemWindows(activity.window, false)
+            WindowInsetsControllerCompat(activity.window, decorView).apply {
+                hide(WindowInsetsCompat.Type.systemBars())
+                systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+            activity.window.statusBarColor = android.graphics.Color.TRANSPARENT
+            activity.window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        } catch (e: Exception) {
+            AppLogger.w("WindowHelper", "Failed to hide system bars for fullscreen", e)
+        }
         return restoreOrientation
     }
 
