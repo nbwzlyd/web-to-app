@@ -2680,8 +2680,17 @@ fun WebViewScreen(
                         webViewCallbacks = webViewCallbacks,
                         webViewManager = webViewManager,
                         onWebViewCreated = { wv ->
+                            if (installWebPageColorBridge) {
+                                wv.addJavascriptInterface(colorThemeBridge, ColorThemeBridge.JS_INTERFACE_NAME)
+                            }
                             webViewRef = wv
                             onWebViewCreated(wv)
+                        },
+                        onWebViewRefUpdated = { wv ->
+                            webViewRef = wv
+                            if (useWebPageStatusBarColor) {
+                                startWebPageStatusBarColorTracking(wv, colorThemeBridge, wv.url)
+                            }
                         },
                         swipeRefreshEnabled = mwApp.webViewConfig.swipeRefreshEnabled,
                         isRefreshing = isRefreshing,

@@ -151,6 +151,7 @@ fun ShellContentRouter(
                 webViewCallbacks = webViewCallbacks,
                 webViewManager = webViewManager,
                 onWebViewCreated = onWebViewCreated,
+                onWebViewRefUpdated = onWebViewRefUpdated,
                 swipeRefreshEnabled = swipeRefreshEnabled,
                 isRefreshing = isRefreshing,
                 onRefresh = onRefresh

@@ -406,7 +406,12 @@ fun ShellScreen(
         isRefreshing = isRefreshing,
         onRefresh = { isRefreshing = false },
         onWebViewCreated = handleWebViewCreated,
-        onWebViewRefUpdated = { webViewRef = it },
+        onWebViewRefUpdated = { webView ->
+            webViewRef = webView
+            if (useWebPageStatusBarColor) {
+                startWebPageStatusBarColorTracking(webView, colorThemeBridge, webView.url)
+            }
+        },
         onShowActivationDialog = { showActivationDialog = true },
         onErrorDismiss = { errorMessage = null },
         onActivityFinish = { activity.finish() },

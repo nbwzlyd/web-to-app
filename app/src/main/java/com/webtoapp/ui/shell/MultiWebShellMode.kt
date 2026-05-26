@@ -63,6 +63,7 @@ fun MultiWebShellMode(
     webViewCallbacks: WebViewCallbacks,
     webViewManager: com.webtoapp.core.webview.WebViewManager,
     onWebViewCreated: (WebView) -> Unit,
+    onWebViewRefUpdated: (WebView) -> Unit,
     swipeRefreshEnabled: Boolean = false,
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {}
@@ -128,12 +129,19 @@ fun MultiWebShellMode(
     }
 
     when (multiWebConfig.displayMode.uppercase()) {
-        "TABS" -> TabsMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, swipeRefreshEnabled, isRefreshing, onRefresh)
-        "CARDS" -> CardsMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, swipeRefreshEnabled, isRefreshing, onRefresh)
-        "FEED" -> FeedMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, swipeRefreshEnabled, isRefreshing, onRefresh)
-        "DRAWER" -> DrawerMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, swipeRefreshEnabled, isRefreshing, onRefresh)
-        else -> TabsMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, swipeRefreshEnabled, isRefreshing, onRefresh)
+        "TABS" -> TabsMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, onWebViewRefUpdated, swipeRefreshEnabled, isRefreshing, onRefresh)
+        "CARDS" -> CardsMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, onWebViewRefUpdated, swipeRefreshEnabled, isRefreshing, onRefresh)
+        "FEED" -> FeedMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, onWebViewRefUpdated, swipeRefreshEnabled, isRefreshing, onRefresh)
+        "DRAWER" -> DrawerMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, onWebViewRefUpdated, swipeRefreshEnabled, isRefreshing, onRefresh)
+        else -> TabsMode(config, multiWebConfig, sites, localBaseUrl, webViewConfig, webViewCallbacks, webViewManager, onWebViewCreated, onWebViewRefUpdated, swipeRefreshEnabled, isRefreshing, onRefresh)
     }
+}
+
+@Composable
+private fun rememberHideInternalTopAppBar(config: ShellConfig): Boolean {
+    val isDarkTheme = com.webtoapp.ui.theme.LocalIsDarkTheme.current
+    return config.shouldApplyWebPageStatusBarColor(isDarkTheme) &&
+        !config.webViewConfig.showToolbarInFullscreen
 }
 
 
@@ -150,6 +158,7 @@ private fun TabsMode(
     webViewCallbacks: WebViewCallbacks,
     webViewManager: com.webtoapp.core.webview.WebViewManager,
     onWebViewCreated: (WebView) -> Unit,
+    onWebViewRefUpdated: (WebView) -> Unit,
     swipeRefreshEnabled: Boolean,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
@@ -273,6 +282,9 @@ private fun TabsMode(
                                             webViewCallbacks.onLongPress(this, lastTouchX, lastTouchY)
                                         }
                                         onWebViewCreated(this)
+                                        if (index == selectedTab) {
+                                            onWebViewRefUpdated(this)
+                                        }
                                         loadUrl(site.getEffectiveUrl(localBaseUrl))
                                     }
                                 }
@@ -290,7 +302,10 @@ private fun TabsMode(
                         child.visibility = if (i == selectedTab) android.view.View.VISIBLE else android.view.View.GONE
                     }
 
-                    webViews[selectedTab]?.let { onWebViewCreated(it) }
+                    webViews[selectedTab]?.let {
+                        onWebViewCreated(it)
+                        onWebViewRefUpdated(it)
+                    }
 
                     val currentSwipe = frameLayout.getChildAt(selectedTab) as? EdgeSwipeRefreshLayout
                     if (currentSwipe != null) {
@@ -324,11 +339,13 @@ private fun CardsMode(
     webViewCallbacks: WebViewCallbacks,
     webViewManager: com.webtoapp.core.webview.WebViewManager,
     onWebViewCreated: (WebView) -> Unit,
+    onWebViewRefUpdated: (WebView) -> Unit,
     swipeRefreshEnabled: Boolean,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
 ) {
     var openSite by remember { mutableStateOf<MultiWebSiteShellConfig?>(null) }
+    val hideInternalTopAppBar = rememberHideInternalTopAppBar(config)
 
     if (openSite != null) {
 
@@ -337,17 +354,19 @@ private fun CardsMode(
             containerColor = Color.Transparent,
             contentWindowInsets = WindowInsets(0),
             topBar = {
-                TopAppBar(
-                    title = { Text(site.name.ifBlank { extractDomain(site.url) }) },
-                    navigationIcon = {
-                        IconButton(onClick = { openSite = null }) {
-                            Icon(Icons.Default.Close, contentDescription = Strings.close)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                if (!hideInternalTopAppBar) {
+                    TopAppBar(
+                        title = { Text(site.name.ifBlank { extractDomain(site.url) }) },
+                        navigationIcon = {
+                            IconButton(onClick = { openSite = null }) {
+                                Icon(Icons.Default.Close, contentDescription = Strings.close)
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        )
                     )
-                )
+                }
             }
         ) { padding ->
             var swipeChildWebView: WebView? = null
@@ -396,6 +415,7 @@ private fun CardsMode(
                                 webViewCallbacks.onLongPress(this, lastTouchX, lastTouchY)
                             }
                             onWebViewCreated(this)
+                            onWebViewRefUpdated(this)
                             loadUrl(site.getEffectiveUrl(localBaseUrl))
                         }
                         swipeChildWebView = createdWebView
@@ -619,11 +639,13 @@ private fun FeedMode(
     webViewCallbacks: WebViewCallbacks,
     webViewManager: com.webtoapp.core.webview.WebViewManager,
     onWebViewCreated: (WebView) -> Unit,
+    onWebViewRefUpdated: (WebView) -> Unit,
     swipeRefreshEnabled: Boolean,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val hideInternalTopAppBar = rememberHideInternalTopAppBar(config)
     var feedItems by remember { mutableStateOf<List<FeedItem>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var openUrl by remember { mutableStateOf<String?>(null) }
@@ -644,14 +666,16 @@ private fun FeedMode(
             containerColor = Color.Transparent,
             contentWindowInsets = WindowInsets(0),
             topBar = {
-                TopAppBar(
-                    title = { Text(openTitle, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                    navigationIcon = {
-                        IconButton(onClick = { openUrl = null }) {
-                            Icon(Icons.Default.Close, contentDescription = Strings.close)
+                if (!hideInternalTopAppBar) {
+                    TopAppBar(
+                        title = { Text(openTitle, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        navigationIcon = {
+                            IconButton(onClick = { openUrl = null }) {
+                                Icon(Icons.Default.Close, contentDescription = Strings.close)
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         ) { padding ->
             var swipeChildWebView: WebView? = null
@@ -700,6 +724,7 @@ private fun FeedMode(
                                 webViewCallbacks.onLongPress(this, lastTouchX, lastTouchY)
                             }
                             onWebViewCreated(this)
+                            onWebViewRefUpdated(this)
                             loadUrl(openUrl!!)
                         }
                         swipeChildWebView = createdWebView
@@ -726,26 +751,28 @@ private fun FeedMode(
             containerColor = Color.Transparent,
             contentWindowInsets = WindowInsets(0),
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(Strings.multiWebModeFeed, fontWeight = FontWeight.Bold)
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                scope.launch {
-                                    isLoading = true
-                                    feedItems = withContext(Dispatchers.IO) {
-                                        fetchFeedItems(sites)
+                if (!hideInternalTopAppBar) {
+                    TopAppBar(
+                        title = {
+                            Text(Strings.multiWebModeFeed, fontWeight = FontWeight.Bold)
+                        },
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        isLoading = true
+                                        feedItems = withContext(Dispatchers.IO) {
+                                            fetchFeedItems(sites)
+                                        }
+                                        isLoading = false
                                     }
-                                    isLoading = false
                                 }
+                            ) {
+                                Icon(Icons.Default.Refresh, contentDescription = Strings.refresh)
                             }
-                        ) {
-                            Icon(Icons.Default.Refresh, contentDescription = Strings.refresh)
                         }
-                    }
-                )
+                    )
+                }
             }
         ) { padding ->
             if (isLoading && feedItems.isEmpty()) {
@@ -887,6 +914,7 @@ private fun DrawerMode(
     webViewCallbacks: WebViewCallbacks,
     webViewManager: com.webtoapp.core.webview.WebViewManager,
     onWebViewCreated: (WebView) -> Unit,
+    onWebViewRefUpdated: (WebView) -> Unit,
     swipeRefreshEnabled: Boolean,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
@@ -895,6 +923,7 @@ private fun DrawerMode(
     var drawerVisible by remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val hideInternalTopAppBar = rememberHideInternalTopAppBar(config)
 
     LaunchedEffect(drawerVisible) {
         if (drawerVisible) {
@@ -971,25 +1000,27 @@ private fun DrawerMode(
             containerColor = Color.Transparent,
             contentWindowInsets = WindowInsets(0),
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            currentSite?.name?.ifBlank { currentSite?.url?.let { extractDomain(it) } ?: "" } ?: "",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                if (!hideInternalTopAppBar) {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                currentSite?.name?.ifBlank { currentSite?.url?.let { extractDomain(it) } ?: "" } ?: "",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = {
+                                drawerVisible = !drawerVisible
+                            }) {
+                                Icon(Icons.Default.Menu, contentDescription = Strings.more)
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            drawerVisible = !drawerVisible
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = Strings.more)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface
                     )
-                )
+                }
             }
         ) { padding ->
             Box(
@@ -1050,6 +1081,9 @@ private fun DrawerMode(
                                                 webViewCallbacks.onLongPress(this, lastTouchX, lastTouchY)
                                             }
                                             onWebViewCreated(this)
+                                            if (currentSite?.id == site.id) {
+                                                onWebViewRefUpdated(this)
+                                            }
                                             loadUrl(site.getEffectiveUrl(localBaseUrl))
                                         }
                                     }
@@ -1070,7 +1104,12 @@ private fun DrawerMode(
                             child.visibility = if (child.tag == selectedId) android.view.View.VISIBLE else android.view.View.GONE
                         }
 
-                        selectedId?.let { id -> webViews[id]?.let { onWebViewCreated(it) } }
+                        selectedId?.let { id ->
+                            webViews[id]?.let {
+                                onWebViewCreated(it)
+                                onWebViewRefUpdated(it)
+                            }
+                        }
 
                         val currentSwipe = frameLayout.findViewWithTag<android.view.View>(selectedId) as? EdgeSwipeRefreshLayout
                         if (currentSwipe != null) {
