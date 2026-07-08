@@ -33,6 +33,8 @@ fun buildWebViewConfig(config: ShellConfig): WebViewConfig {
         customUserAgent = config.webViewConfig.customUserAgent,
         openExternalLinks = config.webViewConfig.openExternalLinks,
         downloadEnabled = config.webViewConfig.downloadEnabled,
+        downloadLocationMode = try { com.webtoapp.data.model.DownloadLocationMode.valueOf(config.webViewConfig.downloadLocationMode) } catch (e: Exception) { com.webtoapp.data.model.DownloadLocationMode.SYSTEM_DOWNLOAD },
+        customDownloadDirUri = config.webViewConfig.customDownloadDirUri,
         hideToolbar = config.webViewConfig.hideToolbar,
         hideBrowserToolbar = config.webViewConfig.hideBrowserToolbar,
         toolbarShowTitle = config.webViewConfig.toolbarShowTitle,
@@ -68,7 +70,7 @@ fun buildWebViewConfig(config: ShellConfig): WebViewConfig {
 
         longPressMenuEnabled = config.webViewConfig.longPressMenuEnabled,
         longPressMenuStyle = try { com.webtoapp.data.model.LongPressMenuStyle.valueOf(config.webViewConfig.longPressMenuStyle) } catch (e: Exception) { com.webtoapp.data.model.LongPressMenuStyle.FULL },
-        adBlockToggleEnabled = config.webViewConfig.adBlockToggleEnabled,
+
         popupBlockerEnabled = config.webViewConfig.popupBlockerEnabled,
         popupBlockerToggleEnabled = config.webViewConfig.popupBlockerToggleEnabled,
 
@@ -277,6 +279,7 @@ fun buildWebViewConfig(config: ShellConfig): WebViewConfig {
         tlsFingerprintEnabled = config.webViewConfig.tlsFingerprintEnabled,
         tlsFingerprintTemplate = config.webViewConfig.tlsFingerprintTemplate,
         tlsFingerprintCustomCiphers = config.webViewConfig.tlsFingerprintCustomCiphers,
+        antiCapture = config.webViewConfig.antiCapture,
 
         dnsMode = config.webViewConfig.dnsMode,
         dnsConfig = com.webtoapp.data.model.DnsConfig(

@@ -2674,16 +2674,16 @@ object Strings {
     }
 
     val btnStartBuild: String get() = when (lang) {
-        AppLanguage.CHINESE -> "开始构建"
-        AppLanguage.ENGLISH -> "Start Build"
-        AppLanguage.ARABIC -> "بدء البناء"
-        AppLanguage.PORTUGUESE -> "Start Build"
-        AppLanguage.SPANISH -> "Start Build"
-        AppLanguage.FRENCH -> "Start Build"
-        AppLanguage.GERMAN -> "Start Build"
-        AppLanguage.RUSSIAN -> "Start Build"
-        AppLanguage.JAPANESE -> "Start Build"
-        AppLanguage.KOREAN -> "Start Build"
+        AppLanguage.CHINESE -> "构建"
+        AppLanguage.ENGLISH -> "Build"
+        AppLanguage.ARABIC -> "بناء"
+        AppLanguage.PORTUGUESE -> "Build"
+        AppLanguage.SPANISH -> "Build"
+        AppLanguage.FRENCH -> "Build"
+        AppLanguage.GERMAN -> "Build"
+        AppLanguage.RUSSIAN -> "Build"
+        AppLanguage.JAPANESE -> "Build"
+        AppLanguage.KOREAN -> "Build"
     }
 
     val btnReset: String get() = when (lang) {
@@ -3597,16 +3597,16 @@ object Strings {
     }
 
     val depGoDesc: String get() = when (lang) {
-        AppLanguage.CHINESE -> "Go 1.26 工具链 (Termux 构建) · 支持 go build / go mod / go run · arm64-v8a"
-        AppLanguage.ENGLISH -> "Go 1.26 toolchain (Termux build) · Supports go build / go mod / go run · arm64-v8a"
-        AppLanguage.ARABIC -> "سلسلة أدوات Go 1.26 (Termux) · تدعم go build / go mod / go run · arm64-v8a"
-        AppLanguage.PORTUGUESE -> "Go 1.26 toolchain (Termux build) · Supports go build / go mod / go run · arm64-v8a"
-        AppLanguage.SPANISH -> "Go 1.26 toolchain (Termux build) · Supports go build / go mod / go run · arm64-v8a"
-        AppLanguage.FRENCH -> "Go 1.26 toolchain (Termux build) · Supports go build / go mod / go run · arm64-v8a"
-        AppLanguage.GERMAN -> "Go 1.26 toolchain (Termux build) · Supports go build / go mod / go run · arm64-v8a"
-        AppLanguage.RUSSIAN -> "Go 1.26 toolchain (Termux build) · Supports go build / go mod / go run · arm64-v8a"
-        AppLanguage.JAPANESE -> "Go 1.26 toolchain (Termux build) · Supports go build / go mod / go run · arm64-v8a"
-        AppLanguage.KOREAN -> "Go 1.26 toolchain (Termux build) · Supports go build / go mod / go run · arm64-v8a"
+        AppLanguage.CHINESE -> "Go 1.26 官方工具链 · 支持 go build / go mod / go run · arm64-v8a"
+        AppLanguage.ENGLISH -> "Go 1.26 official toolchain · Supports go build / go mod / go run · arm64-v8a"
+        AppLanguage.ARABIC -> "سلسلة أدوات Go 1.26 الرسمية · تدعم go build / go mod / go run · arm64-v8a"
+        AppLanguage.PORTUGUESE -> "Go 1.26 official toolchain · Supports go build / go mod / go run · arm64-v8a"
+        AppLanguage.SPANISH -> "Go 1.26 official toolchain · Supports go build / go mod / go run · arm64-v8a"
+        AppLanguage.FRENCH -> "Go 1.26 official toolchain · Supports go build / go mod / go run · arm64-v8a"
+        AppLanguage.GERMAN -> "Go 1.26 official toolchain · Supports go build / go mod / go run · arm64-v8a"
+        AppLanguage.RUSSIAN -> "Go 1.26 official toolchain · Supports go build / go mod / go run · arm64-v8a"
+        AppLanguage.JAPANESE -> "Go 1.26 official toolchain · Supports go build / go mod / go run · arm64-v8a"
+        AppLanguage.KOREAN -> "Go 1.26 official toolchain · Supports go build / go mod / go run · arm64-v8a"
     }
 
     val depWpProjects: String get() = when (lang) {
@@ -6483,32 +6483,6 @@ object Strings {
         AppLanguage.KOREAN -> "Every Launch"
     }
 
-    val showEmoji: String get() = when (lang) {
-        AppLanguage.CHINESE -> "显示表情"
-        AppLanguage.ENGLISH -> "Show Emoji"
-        AppLanguage.ARABIC -> "عرض الرموز التعبيرية"
-        AppLanguage.PORTUGUESE -> "Show Emoji"
-        AppLanguage.SPANISH -> "Show Emoji"
-        AppLanguage.FRENCH -> "Show Emoji"
-        AppLanguage.GERMAN -> "Show Emoji"
-        AppLanguage.RUSSIAN -> "Show Emoji"
-        AppLanguage.JAPANESE -> "Show Emoji"
-        AppLanguage.KOREAN -> "Show Emoji"
-    }
-
-    val enableAnimation: String get() = when (lang) {
-        AppLanguage.CHINESE -> "启用动画"
-        AppLanguage.ENGLISH -> "Enable Animation"
-        AppLanguage.ARABIC -> "تفعيل الرسوم المتحركة"
-        AppLanguage.PORTUGUESE -> "Enable Animation"
-        AppLanguage.SPANISH -> "Enable Animation"
-        AppLanguage.FRENCH -> "Enable Animation"
-        AppLanguage.GERMAN -> "Enable Animation"
-        AppLanguage.RUSSIAN -> "Enable Animation"
-        AppLanguage.JAPANESE -> "Enable Animation"
-        AppLanguage.KOREAN -> "Enable Animation"
-    }
-
     val announcementTriggerSettings: String get() = when (lang) {
         AppLanguage.CHINESE -> "触发机制"
         AppLanguage.ENGLISH -> "Trigger Settings"
@@ -6689,32 +6663,6 @@ object Strings {
         AppLanguage.RUSSIAN -> "Allow users to permanently dismiss this announcement"
         AppLanguage.JAPANESE -> "Allow users to permanently dismiss this announcement"
         AppLanguage.KOREAN -> "Allow users to permanently dismiss this announcement"
-    }
-
-    val announcementEmojiHint: String get() = when (lang) {
-        AppLanguage.CHINESE -> "在公告弹窗中显示装饰性表情图标"
-        AppLanguage.ENGLISH -> "Show decorative emoji icons in announcement popup"
-        AppLanguage.ARABIC -> "عرض رموز تعبيرية زخرفية في الإعلان المنبثق"
-        AppLanguage.PORTUGUESE -> "Show decorative emoji icons in announcement popup"
-        AppLanguage.SPANISH -> "Show decorative emoji icons in announcement popup"
-        AppLanguage.FRENCH -> "Show decorative emoji icons in announcement popup"
-        AppLanguage.GERMAN -> "Show decorative emoji icons in announcement popup"
-        AppLanguage.RUSSIAN -> "Show decorative emoji icons in announcement popup"
-        AppLanguage.JAPANESE -> "Show decorative emoji icons in announcement popup"
-        AppLanguage.KOREAN -> "Show decorative emoji icons in announcement popup"
-    }
-
-    val announcementAnimationHint: String get() = when (lang) {
-        AppLanguage.CHINESE -> "公告弹出时播放入场动画效果"
-        AppLanguage.ENGLISH -> "Play entrance animation when announcement appears"
-        AppLanguage.ARABIC -> "تشغيل رسوم متحركة عند ظهور الإعلان"
-        AppLanguage.PORTUGUESE -> "Play entrance animation when announcement appears"
-        AppLanguage.SPANISH -> "Play entrance animation when announcement appears"
-        AppLanguage.FRENCH -> "Play entrance animation when announcement appears"
-        AppLanguage.GERMAN -> "Play entrance animation when announcement appears"
-        AppLanguage.RUSSIAN -> "Play entrance animation when announcement appears"
-        AppLanguage.JAPANESE -> "Play entrance animation when announcement appears"
-        AppLanguage.KOREAN -> "Play entrance animation when announcement appears"
     }
 
     val adBlocking: String get() = when (lang) {
@@ -9123,6 +9071,19 @@ object Strings {
         AppLanguage.RUSSIAN -> "Background Color"
         AppLanguage.JAPANESE -> "Background Color"
         AppLanguage.KOREAN -> "Background Color"
+    }
+
+    val followPageTop: String get() = when (lang) {
+        AppLanguage.CHINESE -> "跟随网页顶部"
+        AppLanguage.ENGLISH -> "Follow Page Top"
+        AppLanguage.ARABIC -> "اتباع أعلى الصفحة"
+        AppLanguage.PORTUGUESE -> "Follow Page Top"
+        AppLanguage.SPANISH -> "Follow Page Top"
+        AppLanguage.FRENCH -> "Follow Page Top"
+        AppLanguage.GERMAN -> "Follow Page Top"
+        AppLanguage.RUSSIAN -> "Follow Page Top"
+        AppLanguage.JAPANESE -> "Follow Page Top"
+        AppLanguage.KOREAN -> "Follow Page Top"
     }
 
     val selectBackgroundImage: String get() = when (lang) {
@@ -13020,69 +12981,84 @@ object Strings {
         AppLanguage.KOREAN -> "Selected lists are downloaded and compiled into the generated APK"
     }
 
-    val adBlockRuntimeControls: String get() = when (lang) {
-        AppLanguage.CHINESE -> "运行时控件"
-        AppLanguage.ENGLISH -> "Runtime Controls"
-        AppLanguage.ARABIC -> "عناصر تحكم وقت التشغيل"
-        AppLanguage.PORTUGUESE -> "Runtime Controls"
-        AppLanguage.SPANISH -> "Runtime Controls"
-        AppLanguage.FRENCH -> "Runtime Controls"
-        AppLanguage.GERMAN -> "Runtime Controls"
-        AppLanguage.RUSSIAN -> "Runtime Controls"
-        AppLanguage.JAPANESE -> "Runtime Controls"
-        AppLanguage.KOREAN -> "Runtime Controls"
+    val adBlockSelectSubscriptions: String get() = when (lang) {
+        AppLanguage.CHINESE -> "选择过滤规则源"
+        AppLanguage.ENGLISH -> "Select Filter Lists"
+        AppLanguage.ARABIC -> "اختر قوائم التصفية"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Select Filter Lists"
     }
 
-    val adBlockEnabled: String get() = when (lang) {
-        AppLanguage.CHINESE -> "广告拦截已开启"
-        AppLanguage.ENGLISH -> "Ad Block Enabled"
-        AppLanguage.ARABIC -> "تم تفعيل حظر الإعلانات"
-        AppLanguage.PORTUGUESE -> "Ad Block Enabled"
-        AppLanguage.SPANISH -> "Ad Block Enabled"
-        AppLanguage.FRENCH -> "Ad Block Enabled"
-        AppLanguage.GERMAN -> "Ad Block Enabled"
-        AppLanguage.RUSSIAN -> "Ad Block Enabled"
-        AppLanguage.JAPANESE -> "Ad Block Enabled"
-        AppLanguage.KOREAN -> "Ad Block Enabled"
+    val adBlockSubscriptions: String get() = when (lang) {
+        AppLanguage.CHINESE -> "过滤规则源"
+        AppLanguage.ENGLISH -> "Filter Lists"
+        AppLanguage.ARABIC -> "قوائم التصفية"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Filter Lists"
     }
 
-    val adBlockDisabled: String get() = when (lang) {
-        AppLanguage.CHINESE -> "广告拦截已关闭"
-        AppLanguage.ENGLISH -> "Ad Block Disabled"
-        AppLanguage.ARABIC -> "تم إيقاف حظر الإعلانات"
-        AppLanguage.PORTUGUESE -> "Ad Block Disabled"
-        AppLanguage.SPANISH -> "Ad Block Disabled"
-        AppLanguage.FRENCH -> "Ad Block Disabled"
-        AppLanguage.GERMAN -> "Ad Block Disabled"
-        AppLanguage.RUSSIAN -> "Ad Block Disabled"
-        AppLanguage.JAPANESE -> "Ad Block Disabled"
-        AppLanguage.KOREAN -> "Ad Block Disabled"
+    val adBlockNoDownloadedSourcesShort: String get() = when (lang) {
+        AppLanguage.CHINESE -> "未下载"
+        AppLanguage.ENGLISH -> "Not downloaded"
+        AppLanguage.ARABIC -> "غير محمّل"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Not downloaded"
     }
 
-    val adBlockToggleEnabled: String get() = when (lang) {
-        AppLanguage.CHINESE -> "允许用户切换"
-        AppLanguage.ENGLISH -> "Allow User Toggle"
-        AppLanguage.ARABIC -> "السماح للمستخدم بالتبديل"
-        AppLanguage.PORTUGUESE -> "Allow User Toggle"
-        AppLanguage.SPANISH -> "Allow User Toggle"
-        AppLanguage.FRENCH -> "Allow User Toggle"
-        AppLanguage.GERMAN -> "Allow User Toggle"
-        AppLanguage.RUSSIAN -> "Allow User Toggle"
-        AppLanguage.JAPANESE -> "Allow User Toggle"
-        AppLanguage.KOREAN -> "Allow User Toggle"
+    val adBlockNoSubscriptionSelected: String get() = when (lang) {
+        AppLanguage.CHINESE -> "未选择规则源"
+        AppLanguage.ENGLISH -> "No filter list selected"
+        AppLanguage.ARABIC -> "لم يتم اختيار قائمة تصفية"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "No filter list selected"
     }
 
-    val adBlockToggleDescription: String get() = when (lang) {
-        AppLanguage.CHINESE -> "启用后，用户可在运行时通过悬浮按钮开关广告拦截"
-        AppLanguage.ENGLISH -> "When enabled, user can toggle ad blocking via floating button at runtime"
-        AppLanguage.ARABIC -> "عند التفعيل، يمكن للمستخدم تبديل حظر الإعلانات عبر الزر العائم أثناء التشغيل"
-        AppLanguage.PORTUGUESE -> "When enabled, user can toggle ad blocking via floating button at runtime"
-        AppLanguage.SPANISH -> "When enabled, user can toggle ad blocking via floating button at runtime"
-        AppLanguage.FRENCH -> "When enabled, user can toggle ad blocking via floating button at runtime"
-        AppLanguage.GERMAN -> "When enabled, user can toggle ad blocking via floating button at runtime"
-        AppLanguage.RUSSIAN -> "When enabled, user can toggle ad blocking via floating button at runtime"
-        AppLanguage.JAPANESE -> "When enabled, user can toggle ad blocking via floating button at runtime"
-        AppLanguage.KOREAN -> "When enabled, user can toggle ad blocking via floating button at runtime"
+    val adBlockEnabledSourcesLabel: String get() = when (lang) {
+        AppLanguage.CHINESE -> "已启用规则源"
+        AppLanguage.ENGLISH -> "Enabled filter lists"
+        AppLanguage.ARABIC -> "قوائم التصفية المفعّلة"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Enabled filter lists"
+    }
+
+    val adBlockAddMoreSources: String get() = when (lang) {
+        AppLanguage.CHINESE -> "添加更多规则源"
+        AppLanguage.ENGLISH -> "Add more filter lists"
+        AppLanguage.ARABIC -> "إضافة المزيد من قوائم التصفية"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Add more filter lists"
+    }
+
+    val adBlockManageSubscriptions: String get() = when (lang) {
+        AppLanguage.CHINESE -> "管理过滤规则源（%d）"
+        AppLanguage.ENGLISH -> "Manage Filter Lists (%d)"
+        AppLanguage.ARABIC -> "إدارة قوائم التصفية (%d)"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Manage Filter Lists (%d)"
+    }
+
+    val adBlockSubscriptionsCount: String get() = when (lang) {
+        AppLanguage.CHINESE -> "%d 个订阅源"
+        AppLanguage.ENGLISH -> "%d subscriptions"
+        AppLanguage.ARABIC -> "%d اشتراكات"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "%d subscriptions"
+    }
+
+    val adBlockInactive: String get() = when (lang) {
+        AppLanguage.CHINESE -> "未启用——选择规则源或添加自定义规则即可开启"
+        AppLanguage.ENGLISH -> "Inactive — select filter lists or add custom rules to enable"
+        AppLanguage.ARABIC -> "غير نشط — اختر قوائم التصفية أو أضف قواعد مخصصة للتفعيل"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Inactive — select filter lists or add custom rules to enable"
+    }
+
+    val adBlockNoDownloadedSources: String get() = when (lang) {
+        AppLanguage.CHINESE -> "暂无已下载的规则源，请先在 Hosts 广告拦截页面下载"
+        AppLanguage.ENGLISH -> "No downloaded filter lists. Please download some in the Hosts Ad Block page first."
+        AppLanguage.ARABIC -> "لا توجد قوائم تصفية محمّلة. يرجى تحميل بعضها أولاً من صفحة حظر إعلانات Hosts."
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "No downloaded filter lists. Please download some in the Hosts Ad Block page first."
     }
 
     val done: String get() = when (lang) {
@@ -18520,6 +18496,42 @@ object Strings {
         AppLanguage.JAPANESE -> "Select model"
         AppLanguage.KOREAN -> "Select model"
     }
+    val aiCodingModelChipLabel: String get() = when (lang) {
+        AppLanguage.CHINESE -> "模型"
+        AppLanguage.ENGLISH -> "Model"
+        AppLanguage.ARABIC -> "النموذج"
+        AppLanguage.PORTUGUESE -> "Model"
+        AppLanguage.SPANISH -> "Model"
+        AppLanguage.FRENCH -> "Model"
+        AppLanguage.GERMAN -> "Model"
+        AppLanguage.RUSSIAN -> "Model"
+        AppLanguage.JAPANESE -> "Model"
+        AppLanguage.KOREAN -> "Model"
+    }
+    val aiCodingModelPickerProviders: String get() = when (lang) {
+        AppLanguage.CHINESE -> "供应商"
+        AppLanguage.ENGLISH -> "Providers"
+        AppLanguage.ARABIC -> "المزوّدون"
+        AppLanguage.PORTUGUESE -> "Providers"
+        AppLanguage.SPANISH -> "Providers"
+        AppLanguage.FRENCH -> "Providers"
+        AppLanguage.GERMAN -> "Providers"
+        AppLanguage.RUSSIAN -> "Providers"
+        AppLanguage.JAPANESE -> "Providers"
+        AppLanguage.KOREAN -> "Providers"
+    }
+    val aiCodingModelPickerModels: String get() = when (lang) {
+        AppLanguage.CHINESE -> "模型"
+        AppLanguage.ENGLISH -> "Models"
+        AppLanguage.ARABIC -> "النماذج"
+        AppLanguage.PORTUGUESE -> "Models"
+        AppLanguage.SPANISH -> "Models"
+        AppLanguage.FRENCH -> "Models"
+        AppLanguage.GERMAN -> "Models"
+        AppLanguage.RUSSIAN -> "Models"
+        AppLanguage.JAPANESE -> "Models"
+        AppLanguage.KOREAN -> "Models"
+    }
     val aiCodingServiceNotConnected: String get() = when (lang) {
         AppLanguage.CHINESE -> "AI 服务未连接"
         AppLanguage.ENGLISH -> "AI service is not connected"
@@ -18640,6 +18652,28 @@ object Strings {
         AppLanguage.JAPANESE -> "Compact skipped: %s"
         AppLanguage.KOREAN -> "Compact skipped: %s"
     }
+
+    val aiCodingContextCapacity: String get() = when (lang) {
+        AppLanguage.CHINESE -> "上下文容量"
+        AppLanguage.ENGLISH -> "Context Capacity"
+        AppLanguage.ARABIC -> "سعة السياق"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH, AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Context Capacity"
+    }
+
+    val aiCodingContextCapacityHint: String get() = when (lang) {
+        AppLanguage.CHINESE -> "模型支持的最大上下文 token 数（留空使用默认值 %d）"
+        AppLanguage.ENGLISH -> "Max context tokens the model supports (leave empty for default %d)"
+        AppLanguage.ARABIC -> "الحد الأقصى لرموز السياق التي يدعمها النموذج (اتركه فارغًا للافتراضي %d)"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH, AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Max context tokens the model supports (leave empty for default %d)"
+    }
+
+    val aiCodingCompactNow: String get() = when (lang) {
+        AppLanguage.CHINESE -> "压缩上下文"
+        AppLanguage.ENGLISH -> "Compact Context"
+        AppLanguage.ARABIC -> "ضغط السياق"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH, AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Compact Context"
+    }
+
     val aiCodingPermissionRequired: String get() = when (lang) {
         AppLanguage.CHINESE -> "AI 想运行工具"
         AppLanguage.ENGLISH -> "AI wants to run a tool"
@@ -18940,6 +18974,14 @@ object Strings {
         AppLanguage.JAPANESE -> "This turn hit the model's max output length, so the content may be truncated. Ask the AI to continue to finish the rest."
         AppLanguage.KOREAN -> "This turn hit the model's max output length, so the content may be truncated. Ask the AI to continue to finish the rest."
     }
+
+    val aiCodingContinuing: String get() = when (lang) {
+        AppLanguage.CHINESE -> "输出达到长度限制，正在自动续写…"
+        AppLanguage.ENGLISH -> "Output hit length limit, auto-continuing…"
+        AppLanguage.ARABIC -> "بلغ الإخراج حد الطول، يتابع تلقائيًا…"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH, AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Output hit length limit, auto-continuing…"
+    }
+
     val aiCodingFileSaved: String get() = when (lang) {
         AppLanguage.CHINESE -> "已保存 %s"
         AppLanguage.ENGLISH -> "Saved %s"
@@ -36500,30 +36542,12 @@ object Strings {
         AppLanguage.KOREAN -> "Download & Import"
     }
 
-    val hostsSourceEnabled: String get() = when (lang) {
-        AppLanguage.CHINESE -> "已启用"
-        AppLanguage.ENGLISH -> "Enabled"
-        AppLanguage.ARABIC -> "مفعّل"
-        AppLanguage.PORTUGUESE -> "Enabled"
-        AppLanguage.SPANISH -> "Enabled"
-        AppLanguage.FRENCH -> "Enabled"
-        AppLanguage.GERMAN -> "Enabled"
-        AppLanguage.RUSSIAN -> "Enabled"
-        AppLanguage.JAPANESE -> "Enabled"
-        AppLanguage.KOREAN -> "Enabled"
-    }
-
-    val hostsSourceDisabled: String get() = when (lang) {
-        AppLanguage.CHINESE -> "已禁用"
-        AppLanguage.ENGLISH -> "Disabled"
-        AppLanguage.ARABIC -> "معطّل"
-        AppLanguage.PORTUGUESE -> "Disabled"
-        AppLanguage.SPANISH -> "Disabled"
-        AppLanguage.FRENCH -> "Disabled"
-        AppLanguage.GERMAN -> "Disabled"
-        AppLanguage.RUSSIAN -> "Disabled"
-        AppLanguage.JAPANESE -> "Disabled"
-        AppLanguage.KOREAN -> "Disabled"
+    val hostsSourceDownloaded: String get() = when (lang) {
+        AppLanguage.CHINESE -> "已下载"
+        AppLanguage.ENGLISH -> "Downloaded"
+        AppLanguage.ARABIC -> "تم التنزيل"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Downloaded"
     }
 
     val deleteHostsSource: String get() = when (lang) {
@@ -36565,32 +36589,6 @@ object Strings {
         AppLanguage.KOREAN -> "Hosts source deleted"
     }
 
-    val hostsSourceEnabledToast: String get() = when (lang) {
-        AppLanguage.CHINESE -> "Hosts 源已启用"
-        AppLanguage.ENGLISH -> "Hosts source enabled"
-        AppLanguage.ARABIC -> "تم تفعيل مصدر Hosts"
-        AppLanguage.PORTUGUESE -> "Hosts source enabled"
-        AppLanguage.SPANISH -> "Hosts source enabled"
-        AppLanguage.FRENCH -> "Hosts source enabled"
-        AppLanguage.GERMAN -> "Hosts source enabled"
-        AppLanguage.RUSSIAN -> "Hosts source enabled"
-        AppLanguage.JAPANESE -> "Hosts source enabled"
-        AppLanguage.KOREAN -> "Hosts source enabled"
-    }
-
-    val hostsSourceDisabledToast: String get() = when (lang) {
-        AppLanguage.CHINESE -> "Hosts 源已禁用"
-        AppLanguage.ENGLISH -> "Hosts source disabled"
-        AppLanguage.ARABIC -> "تم تعطيل مصدر Hosts"
-        AppLanguage.PORTUGUESE -> "Hosts source disabled"
-        AppLanguage.SPANISH -> "Hosts source disabled"
-        AppLanguage.FRENCH -> "Hosts source disabled"
-        AppLanguage.GERMAN -> "Hosts source disabled"
-        AppLanguage.RUSSIAN -> "Hosts source disabled"
-        AppLanguage.JAPANESE -> "Hosts source disabled"
-        AppLanguage.KOREAN -> "Hosts source disabled"
-    }
-
     val downloading: String get() = when (lang) {
         AppLanguage.CHINESE -> "下载中"
         AppLanguage.ENGLISH -> "Downloading"
@@ -36618,16 +36616,11 @@ object Strings {
     }
 
     val hostsSourcesSummary: String get() = when (lang) {
-        AppLanguage.CHINESE -> "已启用 %d / 已下载 %d"
-        AppLanguage.ENGLISH -> "Enabled %d / Downloaded %d"
-        AppLanguage.ARABIC -> "مفعّل %d / تم تنزيله %d"
-        AppLanguage.PORTUGUESE -> "Enabled %d / Downloaded %d"
-        AppLanguage.SPANISH -> "Enabled %d / Downloaded %d"
-        AppLanguage.FRENCH -> "Enabled %d / Downloaded %d"
-        AppLanguage.GERMAN -> "Enabled %d / Downloaded %d"
-        AppLanguage.RUSSIAN -> "Enabled %d / Downloaded %d"
-        AppLanguage.JAPANESE -> "Enabled %d / Downloaded %d"
-        AppLanguage.KOREAN -> "Enabled %d / Downloaded %d"
+        AppLanguage.CHINESE -> "已下载 %d 个规则源"
+        AppLanguage.ENGLISH -> "%d filter lists downloaded"
+        AppLanguage.ARABIC -> "تم تنزيل %d قائمة تصفية"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "%d filter lists downloaded"
     }
 
     val galleryApp: String get() = when (lang) {
@@ -49940,6 +49933,56 @@ object Strings {
         AppLanguage.JAPANESE -> "TLS Fingerprint Spoofing"
         AppLanguage.KOREAN -> "TLS Fingerprint Spoofing"
     }
+
+    val antiCaptureTitle: String get() = when (lang) {
+        AppLanguage.CHINESE -> "防抓包"
+        AppLanguage.ENGLISH -> "Anti Packet Capture"
+        AppLanguage.ARABIC -> "منع التقاط الحزم"
+        AppLanguage.PORTUGUESE -> "Anti Packet Capture"
+        AppLanguage.SPANISH -> "Anti Packet Capture"
+        AppLanguage.FRENCH -> "Anti Packet Capture"
+        AppLanguage.GERMAN -> "Anti Packet Capture"
+        AppLanguage.RUSSIAN -> "Anti Packet Capture"
+        AppLanguage.JAPANESE -> "Anti Packet Capture"
+        AppLanguage.KOREAN -> "Anti Packet Capture"
+    }
+
+    val vpnBlockTitle: String get() = when (lang) {
+        AppLanguage.CHINESE -> "检测到抓包工具"
+        AppLanguage.ENGLISH -> "Capture Tool Detected"
+        AppLanguage.ARABIC -> "تم اكتشاف أداة التقاط"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "Capture Tool Detected"
+    }
+
+    val vpnBlockMessage: String get() = when (lang) {
+        AppLanguage.CHINESE -> "检测到 VPN 或抓包工具正在运行。请关闭 HttpCanary、ADB 等抓包/VPN 应用后重试。"
+        AppLanguage.ENGLISH -> "A VPN or packet-capture tool is active. Please disable HttpCanary, ADB capture, or similar tools and retry."
+        AppLanguage.ARABIC -> "أداة VPN أو التقاط حزم نشطة. يرجى تعطيل HttpCanary وأدوات مشابهة وإعادة المحاولة."
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "A VPN or packet-capture tool is active. Please disable HttpCanary, ADB capture, or similar tools and retry."
+    }
+
+    val vpnBlockRetry: String get() = when (lang) {
+        AppLanguage.CHINESE -> "我已关闭，重试"
+        AppLanguage.ENGLISH -> "I've disabled it, retry"
+        AppLanguage.ARABIC -> "لقد عطلتها، أعد المحاولة"
+        AppLanguage.PORTUGUESE, AppLanguage.SPANISH, AppLanguage.FRENCH,
+        AppLanguage.GERMAN, AppLanguage.RUSSIAN, AppLanguage.JAPANESE, AppLanguage.KOREAN -> "I've disabled it, retry"
+    }
+
+    val antiCaptureDesc: String get() = when (lang) {
+        AppLanguage.CHINESE -> "开启后，常规抓包软件（如 Charles、Fiddler）将无法截获网页内容；应用将忽略系统代理并拒绝抓包证书。不影响应用内自定义代理。"
+        AppLanguage.ENGLISH -> "When enabled, common packet-capture tools (e.g. Charles, Fiddler) cannot intercept web content; the app ignores system proxy and rejects capture certificates. App-internal proxies are unaffected."
+        AppLanguage.ARABIC -> "عند التفعيل، لا تستطيع أدوات التقاط الحزم الشائعة (مثل Charles وFiddler) اعتراض محتوى الويب؛ سيتجاهل التطبيق وكيل النظام ويرفض شهود الالتقاط. لا يؤثر على الوكلاء الداخليين للتطبيق."
+        AppLanguage.PORTUGUESE -> "When enabled, common packet-capture tools (e.g. Charles, Fiddler) cannot intercept web content; the app ignores system proxy and rejects capture certificates. App-internal proxies are unaffected."
+        AppLanguage.SPANISH -> "When enabled, common packet-capture tools (e.g. Charles, Fiddler) cannot intercept web content; the app ignores system proxy and rejects capture certificates. App-internal proxies are unaffected."
+        AppLanguage.FRENCH -> "When enabled, common packet-capture tools (e.g. Charles, Fiddler) cannot intercept web content; the app ignores system proxy and rejects capture certificates. App-internal proxies are unaffected."
+        AppLanguage.GERMAN -> "When enabled, common packet-capture tools (e.g. Charles, Fiddler) cannot intercept web content; the app ignores system proxy and rejects capture certificates. App-internal proxies are unaffected."
+        AppLanguage.RUSSIAN -> "When enabled, common packet-capture tools (e.g. Charles, Fiddler) cannot intercept web content; the app ignores system proxy and rejects capture certificates. App-internal proxies are unaffected."
+        AppLanguage.JAPANESE -> "When enabled, common packet-capture tools (e.g. Charles, Fiddler) cannot intercept web content; the app ignores system proxy and rejects capture certificates. App-internal proxies are unaffected."
+        AppLanguage.KOREAN -> "When enabled, common packet-capture tools (e.g. Charles, Fiddler) cannot intercept web content; the app ignores system proxy and rejects capture certificates. App-internal proxies are unaffected."
+    }
     val tlsFingerprintSubtitle: String get() = when (lang) {
         AppLanguage.CHINESE -> "伪装 TLS 握手指纹，绕过 JA3/JA4 检测"
         AppLanguage.ENGLISH -> "Spoof TLS handshake fingerprint to bypass JA3/JA4 detection"
@@ -55495,6 +55538,14 @@ object Strings {
     val blobInterceptScopeAll: String get() = when (lang) { AppLanguage.CHINESE -> "全部 blob 下载"; AppLanguage.ENGLISH -> "All blobs"; AppLanguage.ARABIC -> "كل blob"; AppLanguage.PORTUGUESE -> "All blobs"; AppLanguage.SPANISH -> "All blobs"; AppLanguage.FRENCH -> "All blobs"; AppLanguage.GERMAN -> "All blobs"; AppLanguage.RUSSIAN -> "All blobs"; AppLanguage.JAPANESE -> "All blobs"; AppLanguage.KOREAN -> "All blobs"; }
     val blobInterceptScopeOver: String get() = when (lang) { AppLanguage.CHINESE -> "仅大于阈值"; AppLanguage.ENGLISH -> "Over Threshold Only"; AppLanguage.ARABIC -> "أكبر من الحد فقط"; AppLanguage.PORTUGUESE -> "Over Threshold Only"; AppLanguage.SPANISH -> "Over Threshold Only"; AppLanguage.FRENCH -> "Over Threshold Only"; AppLanguage.GERMAN -> "Over Threshold Only"; AppLanguage.RUSSIAN -> "Over Threshold Only"; AppLanguage.JAPANESE -> "Over Threshold Only"; AppLanguage.KOREAN -> "Over Threshold Only"; }
     val blobInterceptThresholdLabel: String get() = when (lang) { AppLanguage.CHINESE -> "阈值（MB）"; AppLanguage.ENGLISH -> "Threshold (MB)"; AppLanguage.ARABIC -> "الحد (ميغابايت)"; AppLanguage.PORTUGUESE -> "Threshold (MB)"; AppLanguage.SPANISH -> "Threshold (MB)"; AppLanguage.FRENCH -> "Threshold (MB)"; AppLanguage.GERMAN -> "Threshold (MB)"; AppLanguage.RUSSIAN -> "Threshold (MB)"; AppLanguage.JAPANESE -> "Threshold (MB)"; AppLanguage.KOREAN -> "Threshold (MB)"; }
+
+    val downloadLocationLabel: String get() = when (lang) { AppLanguage.CHINESE -> "下载位置"; AppLanguage.ENGLISH -> "Download Location"; AppLanguage.ARABIC -> "موقع التنزيل"; AppLanguage.PORTUGUESE -> "Download Location"; AppLanguage.SPANISH -> "Download Location"; AppLanguage.FRENCH -> "Download Location"; AppLanguage.GERMAN -> "Download Location"; AppLanguage.RUSSIAN -> "Download Location"; AppLanguage.JAPANESE -> "Download Location"; AppLanguage.KOREAN -> "Download Location"; }
+    val downloadLocationSystem: String get() = when (lang) { AppLanguage.CHINESE -> "系统下载文件夹"; AppLanguage.ENGLISH -> "System Downloads"; AppLanguage.ARABIC -> "تنزيلات النظام"; AppLanguage.PORTUGUESE -> "System Downloads"; AppLanguage.SPANISH -> "System Downloads"; AppLanguage.FRENCH -> "System Downloads"; AppLanguage.GERMAN -> "System Downloads"; AppLanguage.RUSSIAN -> "System Downloads"; AppLanguage.JAPANESE -> "System Downloads"; AppLanguage.KOREAN -> "System Downloads"; }
+    val downloadLocationAppPrivate: String get() = when (lang) { AppLanguage.CHINESE -> "应用私有目录"; AppLanguage.ENGLISH -> "App Private Folder"; AppLanguage.ARABIC -> "مجلد التطبيق الخاص"; AppLanguage.PORTUGUESE -> "App Private Folder"; AppLanguage.SPANISH -> "App Private Folder"; AppLanguage.FRENCH -> "App Private Folder"; AppLanguage.GERMAN -> "App Private Folder"; AppLanguage.RUSSIAN -> "App Private Folder"; AppLanguage.JAPANESE -> "App Private Folder"; AppLanguage.KOREAN -> "App Private Folder"; }
+    val downloadLocationCustom: String get() = when (lang) { AppLanguage.CHINESE -> "自定义文件夹"; AppLanguage.ENGLISH -> "Custom Folder"; AppLanguage.ARABIC -> "مجلد مخصص"; AppLanguage.PORTUGUESE -> "Custom Folder"; AppLanguage.SPANISH -> "Custom Folder"; AppLanguage.FRENCH -> "Custom Folder"; AppLanguage.GERMAN -> "Custom Folder"; AppLanguage.RUSSIAN -> "Custom Folder"; AppLanguage.JAPANESE -> "Custom Folder"; AppLanguage.KOREAN -> "Custom Folder"; }
+    val downloadLocationCustomPick: String get() = when (lang) { AppLanguage.CHINESE -> "选择文件夹"; AppLanguage.ENGLISH -> "Pick Folder"; AppLanguage.ARABIC -> "اختر مجلدًا"; AppLanguage.PORTUGUESE -> "Pick Folder"; AppLanguage.SPANISH -> "Pick Folder"; AppLanguage.FRENCH -> "Pick Folder"; AppLanguage.GERMAN -> "Pick Folder"; AppLanguage.RUSSIAN -> "Pick Folder"; AppLanguage.JAPANESE -> "Pick Folder"; AppLanguage.KOREAN -> "Pick Folder"; }
+    val downloadLocationCustomEmpty: String get() = when (lang) { AppLanguage.CHINESE -> "未选择自定义文件夹"; AppLanguage.ENGLISH -> "No custom folder selected"; AppLanguage.ARABIC -> "لم يتم اختيار مجلد مخصص"; AppLanguage.PORTUGUESE -> "No custom folder selected"; AppLanguage.SPANISH -> "No custom folder selected"; AppLanguage.FRENCH -> "No custom folder selected"; AppLanguage.GERMAN -> "No custom folder selected"; AppLanguage.RUSSIAN -> "No custom folder selected"; AppLanguage.JAPANESE -> "No custom folder selected"; AppLanguage.KOREAN -> "No custom folder selected"; }
+    val downloadLocationCustomHint: String get() = when (lang) { AppLanguage.CHINESE -> "选择一个文件夹作为下载目录"; AppLanguage.ENGLISH -> "Pick a folder as the download directory"; AppLanguage.ARABIC -> "اختر مجلدًا كدليل التنزيل"; AppLanguage.PORTUGUESE -> "Pick a folder as the download directory"; AppLanguage.SPANISH -> "Pick a folder as the download directory"; AppLanguage.FRENCH -> "Pick a folder as the download directory"; AppLanguage.GERMAN -> "Pick a folder as the download directory"; AppLanguage.RUSSIAN -> "Pick a folder as the download directory"; AppLanguage.JAPANESE -> "Pick a folder as the download directory"; AppLanguage.KOREAN -> "Pick a folder as the download directory"; }
 
     val primeActivationModeLabel: String get() = when (lang) { AppLanguage.CHINESE -> "注入方式"; AppLanguage.ENGLISH -> "Injection Mode"; AppLanguage.ARABIC -> "وضع الحقن"; AppLanguage.PORTUGUESE -> "Injection Mode"; AppLanguage.SPANISH -> "Injection Mode"; AppLanguage.FRENCH -> "Injection Mode"; AppLanguage.GERMAN -> "Injection Mode"; AppLanguage.RUSSIAN -> "Injection Mode"; AppLanguage.JAPANESE -> "Injection Mode"; AppLanguage.KOREAN -> "Injection Mode"; }
     val primeActivationModeTap: String get() = when (lang) { AppLanguage.CHINESE -> "合成触摸"; AppLanguage.ENGLISH -> "Synthetic Tap"; AppLanguage.ARABIC -> "نقرة اصطناعية"; AppLanguage.PORTUGUESE -> "Synthetic Tap"; AppLanguage.SPANISH -> "Synthetic Tap"; AppLanguage.FRENCH -> "Synthetic Tap"; AppLanguage.GERMAN -> "Synthetic Tap"; AppLanguage.RUSSIAN -> "Synthetic Tap"; AppLanguage.JAPANESE -> "Synthetic Tap"; AppLanguage.KOREAN -> "Synthetic Tap"; }

@@ -76,8 +76,6 @@ data class ApkConfig(
     val announcementLink: String get() = announcement.link
     val announcementLinkText: String get() = announcement.linkText
     val announcementTemplate: String get() = announcement.template
-    val announcementShowEmoji: Boolean get() = announcement.showEmoji
-    val announcementAnimationEnabled: Boolean get() = announcement.animationEnabled
     val announcementShowOnce: Boolean get() = announcement.showOnce
     val announcementRequireConfirmation: Boolean get() = announcement.requireConfirmation
     val announcementAllowNeverShow: Boolean get() = announcement.allowNeverShow
@@ -120,7 +118,7 @@ data class ApkConfig(
     val injectScripts: List<com.webtoapp.data.model.UserScript> get() = webView.injectScripts
     val longPressMenuEnabled: Boolean get() = webView.longPressMenuEnabled
     val longPressMenuStyle: String get() = webView.longPressMenuStyle
-    val adBlockToggleEnabled: Boolean get() = webView.adBlockToggleEnabled
+
     val popupBlockerEnabled: Boolean get() = webView.popupBlockerEnabled
     val popupBlockerToggleEnabled: Boolean get() = webView.popupBlockerToggleEnabled
     val openExternalLinks: Boolean get() = webView.openExternalLinks
@@ -164,6 +162,8 @@ data class ApkConfig(
     val enableBlobDownloadInterception: Boolean get() = webViewBehavior.enableBlobDownloadInterception
     val enablePrintBridge: Boolean get() = webViewBehavior.enablePrintBridge
     val downloadEnabled: Boolean get() = webView.downloadEnabled
+    val downloadLocationMode: String get() = webView.downloadLocationMode
+    val customDownloadDirUri: String get() = webView.customDownloadDirUri
     val enableCloudflareCompat: Boolean get() = webViewBehavior.enableCloudflareCompat
     val primeUserActivation: Boolean get() = webViewBehavior.primeUserActivation
 
@@ -234,6 +234,7 @@ data class ApkConfig(
     val tlsFingerprintEnabled: Boolean get() = tlsFingerprint.enabled
     val tlsFingerprintTemplate: String get() = tlsFingerprint.template
     val tlsFingerprintCustomCiphers: List<String> get() = tlsFingerprint.customCipherSuites
+    val antiCaptureEnabled: Boolean get() = webView.antiCapture
 
     val dnsMode: String get() = dns.mode
     val dnsConfig: DnsApkConfig get() = dns.config
@@ -427,8 +428,6 @@ data class AnnouncementBlock(
     val link: String = "",
     val linkText: String = "",
     val template: String = "MINIMAL",
-    val showEmoji: Boolean = true,
-    val animationEnabled: Boolean = true,
     val showOnce: Boolean = true,
     val requireConfirmation: Boolean = false,
     val allowNeverShow: Boolean = false,
@@ -477,7 +476,7 @@ data class WebViewBlock(
     val injectScripts: List<com.webtoapp.data.model.UserScript> = emptyList(),
     val longPressMenuEnabled: Boolean = false,
     val longPressMenuStyle: String = "DISABLED",
-    val adBlockToggleEnabled: Boolean = false,
+
     val popupBlockerEnabled: Boolean = false,
     val popupBlockerToggleEnabled: Boolean = false,
     val openExternalLinks: Boolean = false,
@@ -488,7 +487,10 @@ data class WebViewBlock(
     val pwaOfflineEnabled: Boolean = false,
     val pwaOfflineStrategy: String = "NETWORK_FIRST",
     val keyboardAdjustMode: String = "RESIZE",
-    val downloadEnabled: Boolean = true
+    val downloadEnabled: Boolean = true,
+    val downloadLocationMode: String = "SYSTEM_DOWNLOAD",
+    val customDownloadDirUri: String = "",
+    val antiCapture: Boolean = false
 )
 
 data class WebViewBehaviorBlock(
@@ -549,7 +551,7 @@ data class WebViewBehaviorBlock(
     val enableCookiePersistence: Boolean = true,
     val enablePrivateNetworkBridge: Boolean = false,
     val privateNetworkScope: String = "LOCAL_ONLY",
-    val enableCorsBypass: Boolean = false,
+    val enableCorsBypass: Boolean = true,
     val allowMixedContent: Boolean = false,
     val mixedContentMode: String = "COMPATIBILITY",
     val enableBlobDownloadInterception: Boolean = true,

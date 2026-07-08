@@ -570,7 +570,6 @@ data class EmbeddedShellModule(
         return """
             (function() {
                 'use strict';
-                // Module配置
                 const __MODULE_CONFIG__ = $configJson;
                 const __MODULE_UI_CONFIG__ = $uiConfigJson;
                 const __MODULE_RUN_MODE__ = '${runMode.escapeForJsSingleQuote()}';
@@ -583,12 +582,10 @@ data class EmbeddedShellModule(
                     runMode: __MODULE_RUN_MODE__
                 };
 
-                // Configure访问函数
                 function getConfig(key, defaultValue) {
                     return __MODULE_CONFIG__[key] !== undefined ? __MODULE_CONFIG__[key] : defaultValue;
                 }
 
-                // CSS 注入
                 ${if (cssCode.isNotBlank()) """
                 (function() {
                     const style = document.createElement('style');
@@ -598,7 +595,6 @@ data class EmbeddedShellModule(
                 })();
                 """ else ""}
 
-                // User代码
                 try {
                     $code
                 } catch(e) {
@@ -1134,8 +1130,7 @@ data class WebViewShellConfig(
     @SerializedName("longPressMenuStyle")
     val longPressMenuStyle: String = "DISABLED",
 
-    @SerializedName("adBlockToggleEnabled")
-    val adBlockToggleEnabled: Boolean = false,
+
 
     @SerializedName("popupBlockerEnabled")
     val popupBlockerEnabled: Boolean = false,
@@ -1315,7 +1310,7 @@ data class WebViewShellConfig(
     val privateNetworkScope: String = "LOCAL_ONLY",
 
     @SerializedName("enableCorsBypass")
-    val enableCorsBypass: Boolean = false,
+    val enableCorsBypass: Boolean = true,
 
     @SerializedName("allowMixedContent")
     val allowMixedContent: Boolean = false,
@@ -1401,6 +1396,12 @@ data class WebViewShellConfig(
     @SerializedName("downloadEnabled")
     val downloadEnabled: Boolean = true,
 
+    @SerializedName("downloadLocationMode")
+    val downloadLocationMode: String = "SYSTEM_DOWNLOAD",
+
+    @SerializedName("customDownloadDirUri")
+    val customDownloadDirUri: String = "",
+
     @SerializedName("keyboardAdjustMode")
     val keyboardAdjustMode: String = "RESIZE",
 
@@ -1463,6 +1464,9 @@ data class WebViewShellConfig(
 
     @SerializedName("tlsFingerprintCustomCiphers")
     val tlsFingerprintCustomCiphers: List<String> = emptyList(),
+
+    @SerializedName("antiCapture")
+    val antiCapture: Boolean = false,
 
     @SerializedName("dnsMode")
     val dnsMode: String = "SYSTEM",

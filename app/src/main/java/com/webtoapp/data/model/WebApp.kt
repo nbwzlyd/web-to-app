@@ -133,11 +133,6 @@ enum class AnnouncementTriggerMode {
 data class Announcement(
     val title: String = "",
     val content: String = "",
-    /**
-     * 公告内容是否按 HTML 渲染。默认 false（保持原有纯文本 + 模板样式行为，旧公告零影响）。
-     * 为 true 时，[content] 作为 HTML 嵌入公告弹窗的内容区（外框：标题/关闭按钮/底部按钮/
-     * 触发机制等保持不变）。HTML 由 app 创建者自行编写，仅作富文本展示，渲染时禁用 JavaScript。
-     */
     val contentIsHtml: Boolean = false,
     val linkUrl: String? = null,
     val linkText: String? = null,
@@ -145,8 +140,6 @@ data class Announcement(
     val enabled: Boolean = true,
     val version: Int = 1,
     val template: AnnouncementTemplateType = AnnouncementTemplateType.XIAOHONGSHU,
-    val showEmoji: Boolean = true,
-    val animationEnabled: Boolean = true,
     val requireConfirmation: Boolean = false,
     val allowNeverShow: Boolean = true,
     val triggerOnLaunch: Boolean = true,
@@ -157,6 +150,7 @@ data class Announcement(
 
 enum class StatusBarColorMode {
     THEME,
+    PAGE_TOP,
     TRANSPARENT,
     CUSTOM
 }
@@ -257,6 +251,8 @@ data class WebViewConfig(
     val autoRefreshShowCountdown: Boolean = true,
     val fullscreenEnabled: Boolean = true,
     val downloadEnabled: Boolean = true,
+    val downloadLocationMode: DownloadLocationMode = DownloadLocationMode.SYSTEM_DOWNLOAD,
+    val customDownloadDirUri: String = "",
     val openExternalLinks: Boolean = false,
     val hideBrowserToolbar: Boolean = false,
     val toolbarShowTitle: Boolean = true,
@@ -290,7 +286,7 @@ data class WebViewConfig(
     val followSystemDarkMode: Boolean = false,
     val longPressMenuEnabled: Boolean = false,
     val longPressMenuStyle: LongPressMenuStyle = LongPressMenuStyle.DISABLED,
-    val adBlockToggleEnabled: Boolean = false,
+
     val popupBlockerEnabled: Boolean = false,
     val popupBlockerToggleEnabled: Boolean = false,
 
@@ -324,7 +320,7 @@ data class WebViewConfig(
     val mixedContentMode: MixedContentMode = MixedContentMode.COMPATIBILITY,
     val enablePrivateNetworkBridge: Boolean = false,
     val privateNetworkScope: PrivateNetworkScope = PrivateNetworkScope.LOCAL_ONLY,
-    val enableCorsBypass: Boolean = false,
+    val enableCorsBypass: Boolean = true,
 
     val acceptThirdPartyCookies: Boolean = false,
     val thirdPartyCookieMode: ThirdPartyCookieMode = ThirdPartyCookieMode.SAME_SITE_LAX,
@@ -389,6 +385,8 @@ data class WebViewConfig(
     val tlsFingerprintEnabled: Boolean = false,
     val tlsFingerprintTemplate: String = "CHROME_131",
     val tlsFingerprintCustomCiphers: List<String> = emptyList(),
+
+    val antiCapture: Boolean = false,
 
     val dnsMode: String = "SYSTEM",
     val dnsConfig: DnsConfig = DnsConfig()
@@ -475,12 +473,6 @@ data class DnsConfig(
 
     val bypassSystemDns: Boolean = false,
 
-    /**
-     * Encrypted Client Hello（ECH）。开启后在 TLS 握手中加密 ClientHello（含 SNI），
-     * 隐藏访问的目标域名。依赖 DoH：必须先配置 DoH（dnsMode != SYSTEM 且有有效
-     * dohUrl），ECH 才会生效；仅 GeckoView 引擎支持，系统 WebView 无法控制。
-     * 仅对自身部署了 ECH 的站点（主要是 Cloudflare 系）真正生效，其余静默回退。
-     */
     val echEnabled: Boolean = false
 ) {
 
@@ -490,7 +482,6 @@ data class DnsConfig(
             else -> DnsProvider.entries.find { it.key == provider }?.dohUrl ?: ""
         }
 
-    /** ECH 真正可用的前提：DoH 已配置（有有效的 DoH URL）。 */
     val echEffective: Boolean
         get() = echEnabled && effectiveDohUrl.isNotBlank()
 }
@@ -1440,6 +1431,15 @@ enum class BlobInterceptScope {
     ALL,
 
     SIZE_OVER_THRESHOLD,
+}
+
+enum class DownloadLocationMode {
+
+    SYSTEM_DOWNLOAD,
+
+    APP_PRIVATE,
+
+    CUSTOM
 }
 
 enum class PrimeUserActivationMode {

@@ -129,6 +129,7 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
         observeTodos()
         bindService()
         observeAutoApprovePref()
+        observeCurrentModel()
     }
 
     private fun observeAutoApprovePref() {
@@ -146,6 +147,19 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
             if (enabled) com.webtoapp.core.aicoding.permission.PermissionMode.AutoApprove
             else com.webtoapp.core.aicoding.permission.PermissionMode.Default
         )
+    }
+
+    private fun observeCurrentModel() {
+        viewModelScope.launch {
+            combine(configManager.savedModelsFlow, configManager.defaultModelIdFlow) { models, defaultId ->
+                resolveTextModel(models) to defaultId
+            }.collect { (model, _) ->
+                val label = model?.alias?.takeIf { it.isNotBlank() }
+                    ?: model?.model?.name
+                    ?: Strings.aiCodingModelChipLabel
+                _ui.update { it.copy(currentModelLabel = label) }
+            }
+        }
     }
 
     fun openDrawer(tab: AiCodingUiState.DrawerTab = _ui.value.drawerTab) {
@@ -344,7 +358,7 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
 
         val slashOpen = text.startsWith("/") && !text.contains(" ")
         val slashQuery = if (slashOpen) text.removePrefix("/") else ""
-        val slashMatches = if (slashOpen) skillRegistry.search(slashQuery, limit = 6) else emptyList()
+        val slashMatches = if (slashOpen) skillRegistry.search(slashQuery, limit = 50) else emptyList()
 
         val mention = parseTrailingMention(text)
         val sid = _ui.value.currentSession?.id
@@ -454,24 +468,45 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
     fun openModelPicker() {
         viewModelScope.launch {
             val all = configManager.savedModelsFlow.first()
+            val keys = configManager.apiKeysFlow.first()
+            val keyById = keys.associateBy { it.id }
             val models = all.filter { it.supportsFeature(AiFeature.AI_CODING) }
             if (models.isEmpty()) {
                 _ui.update { it.copy(error = Strings.aiCodingMissingTextModel) }
                 return@launch
             }
-            val currentId = resolveTextModel(all)?.id
-            val choices = models.map { m ->
-                ModelChoice(
-                    id = m.id,
-                    label = m.alias?.takeIf { it.isNotBlank() } ?: m.model.name,
-                    subtitle = "${m.model.provider.displayName} · ${m.model.name}",
-                    selected = m.id == currentId
+            val current = resolveTextModel(all)
+            val currentId = current?.id
+            val currentKeyId = current?.apiKeyId
+
+            val groups = models
+                .groupBy { it.apiKeyId }
+                .mapNotNull { (keyId, ms) ->
+                    val key = keyById[keyId] ?: return@mapNotNull null
+                    val choices = ms.map { m ->
+                        ModelChoice(
+                            id = m.id,
+                            label = m.alias?.takeIf { it.isNotBlank() } ?: m.model.name,
+                            subtitle = "${key.displayName} · ${m.model.name}",
+                            selected = m.id == currentId
+                        )
+                    }
+                    ProviderGroup(
+                        apiKeyId = keyId,
+                        displayName = key.displayName,
+                        models = choices
+                    )
+                }
+                .sortedWith(
+                    compareByDescending<ProviderGroup> { it.apiKeyId == currentKeyId }
+                        .thenBy { it.displayName }
                 )
-            }
+
             _ui.update {
                 it.copy(
                     modelPickerOpen = true,
-                    modelChoices = choices,
+                    modelProviderGroups = groups,
+                    selectedProviderKeyId = currentKeyId ?: groups.firstOrNull()?.apiKeyId,
                     composerText = "",
                     slashOpen = false,
                     slashSuggestions = emptyList()
@@ -512,7 +547,7 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun dismissModelPicker() {
-        _ui.update { it.copy(modelPickerOpen = false, modelChoices = emptyList()) }
+        _ui.update { it.copy(modelPickerOpen = false, modelProviderGroups = emptyList(), selectedProviderKeyId = null) }
     }
 
     private suspend fun resolveTextModel(models: List<com.webtoapp.data.model.SavedModel>): com.webtoapp.data.model.SavedModel? {
@@ -532,7 +567,8 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
             _ui.update {
                 it.copy(
                     modelPickerOpen = false,
-                    modelChoices = emptyList(),
+                    modelProviderGroups = emptyList(),
+                    selectedProviderKeyId = null,
                     info = Strings.aiCodingModelSwitched.format(label)
                 )
             }
@@ -655,7 +691,7 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
         _ui.update { it.copy(pendingChoice = null) }
     }
 
-    private fun compactNow() {
+    fun compactNow() {
         val session = _ui.value.currentSession ?: return
         val service = service ?: run {
             _ui.update { it.copy(error = Strings.aiCodingServiceNotConnected) }
@@ -672,21 +708,24 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
                 return@launch
             }
 
-            _ui.update { it.copy(info = Strings.aiCodingCompacting) }
+            _ui.update { it.copy(compacting = true, info = Strings.aiCodingCompacting) }
             val svc = compactService ?: CompactService(gateway).also { compactService = it }
             val result = svc.compact(session.messages, textModel, textKey)
             if (result.didCompact) {
                 sessionStore.replaceMessages(session.id, result.messages)
                 _ui.update {
                     it.copy(
+                        compacting = false,
                         info = Strings.aiCodingCompactedManual.format(
                             session.messages.size,
                             result.messages.size
-                        )
+                        ),
+                        estimatedContextTokens = svc.estimateTokens(result.messages),
+                        contextCapacity = textModel.effectiveContextLength
                     )
                 }
             } else {
-                _ui.update { it.copy(info = Strings.aiCodingCompactSkipped.format(result.reason)) }
+                _ui.update { it.copy(compacting = false, info = Strings.aiCodingCompactSkipped.format(result.reason)) }
             }
         }
     }
@@ -848,7 +887,8 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
         val imageKey = imageModel?.let { m -> keys.firstOrNull { it.id == m.apiKeyId } }
 
         val compactSvc = compactService ?: CompactService(service!!.gateway).also { compactService = it }
-        val workingSession = if (compactSvc.shouldCompact(session.messages)) {
+        val contextLength = textModel.effectiveContextLength
+        val workingSession = if (compactSvc.shouldCompact(session.messages, contextLength)) {
             val result = compactSvc.compact(session.messages, textModel, textKey)
             if (result.didCompact) {
                 sessionStore.replaceMessages(session.id, result.messages)
@@ -859,6 +899,8 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
 
         streamingSessionId = workingSession.id
         streamText.clear(); streamThinking.clear(); streamTools.clear(); streamToolArgs.clear(); readFilesThisTurn.clear()
+        val compactSvc2 = compactService ?: CompactService(service!!.gateway).also { compactService = it }
+        val estTokens = compactSvc2.estimateTokens(workingSession.messages)
         _ui.update {
             it.copy(
                 phase = AiCodingUiState.Phase.Connecting,
@@ -869,7 +911,9 @@ class AiCodingViewModel(application: Application) : AndroidViewModel(application
                 pendingToolCalls = emptyList(),
                 currentActivity = null,
                 error = null,
-                info = null
+                info = null,
+                estimatedContextTokens = estTokens,
+                contextCapacity = textModel.effectiveContextLength
             )
         }
 

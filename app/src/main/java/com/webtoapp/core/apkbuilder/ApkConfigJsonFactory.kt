@@ -51,8 +51,6 @@ internal object ApkConfigJsonFactory {
         "announcementLink" to announcement.link,
         "announcementLinkText" to announcement.linkText,
         "announcementTemplate" to announcement.template,
-        "announcementShowEmoji" to announcement.showEmoji,
-        "announcementAnimationEnabled" to announcement.animationEnabled,
         "announcementShowOnce" to announcement.showOnce,
         "announcementRequireConfirmation" to announcement.requireConfirmation,
         "announcementAllowNeverShow" to announcement.allowNeverShow,
@@ -204,7 +202,7 @@ internal object ApkConfigJsonFactory {
         "statusBarBackgroundAlphaDark" to statusBar.backgroundAlphaDark,
         "longPressMenuEnabled" to webView.longPressMenuEnabled,
         "longPressMenuStyle" to webView.longPressMenuStyle,
-        "adBlockToggleEnabled" to webView.adBlockToggleEnabled,
+
         "popupBlockerEnabled" to webView.popupBlockerEnabled,
         "popupBlockerToggleEnabled" to webView.popupBlockerToggleEnabled,
         "openExternalLinks" to webView.openExternalLinks,
@@ -314,8 +312,11 @@ internal object ApkConfigJsonFactory {
         "tlsFingerprintEnabled" to tlsFingerprint.enabled,
         "tlsFingerprintTemplate" to tlsFingerprint.template,
         "tlsFingerprintCustomCiphers" to tlsFingerprint.customCipherSuites,
+        "antiCapture" to webView.antiCapture,
         "showFloatingBackButton" to webView.showFloatingBackButton,
         "downloadEnabled" to webView.downloadEnabled,
+        "downloadLocationMode" to webView.downloadLocationMode,
+        "customDownloadDirUri" to webView.customDownloadDirUri,
         "floatingWindowConfig" to floatingWindowConfigPayload(),
         "errorPageConfig" to errorPageConfigPayload()
     )

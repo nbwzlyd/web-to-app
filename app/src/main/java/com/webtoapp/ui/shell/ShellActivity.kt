@@ -60,6 +60,7 @@ class ShellActivity : AppCompatActivity() {
     private var statusBarBackgroundTypeDark: String = "COLOR"
     private var statusBarBackgroundImageDark: String? = null
     private var statusBarBackgroundAlphaDark: Float = 1.0f
+    private var statusBarAutoColor: String? = null
     private var forceHideSystemUi: Boolean = false
     private var keyboardAdjustMode: KeyboardAdjustMode = KeyboardAdjustMode.RESIZE
     private var forcedRunConfig: ForcedRunConfig? = null
@@ -75,7 +76,37 @@ class ShellActivity : AppCompatActivity() {
         darkIcons: Boolean?,
         isDarkTheme: Boolean,
         backgroundAlpha: Float = 1f
-    ) = WindowHelper.applyStatusBarColor(this, colorMode, customColor, darkIcons, isDarkTheme, backgroundAlpha)
+    ) {
+        val resolved = resolveStatusBarColorMode(colorMode, customColor)
+        WindowHelper.applyStatusBarColor(this, resolved.first, resolved.second, darkIcons, isDarkTheme, backgroundAlpha)
+    }
+
+    private fun resolveStatusBarColorMode(colorMode: String, customColor: String?): Pair<String, String?> {
+        return if (colorMode == com.webtoapp.data.model.StatusBarColorMode.PAGE_TOP.name) {
+            val resolvedColor = statusBarAutoColor ?: customColor
+            if (resolvedColor.isNullOrBlank()) {
+                com.webtoapp.data.model.StatusBarColorMode.THEME.name to null
+            } else {
+                com.webtoapp.data.model.StatusBarColorMode.CUSTOM.name to resolvedColor
+            }
+        } else {
+            colorMode to customColor
+        }
+    }
+
+    private fun refreshStatusBarAppearance() {
+        if (customView != null) return
+        val systemDark = isSystemInDarkMode()
+        if (immersiveFullscreenEnabled || forceHideSystemUi) {
+            applyImmersiveFullscreen(true, isDarkTheme = systemDark)
+            return
+        }
+        val effectiveColorMode = if (systemDark) statusBarColorModeDark else statusBarColorMode
+        val effectiveCustomColor = if (systemDark) statusBarCustomColorDark else statusBarCustomColor
+        val effectiveDarkIcons = if (systemDark) statusBarDarkIconsDark else statusBarDarkIcons
+        val effectiveAlpha = if (systemDark) statusBarBackgroundAlphaDark else statusBarBackgroundAlpha
+        applyStatusBarColor(effectiveColorMode, effectiveCustomColor, effectiveDarkIcons, systemDark, effectiveAlpha)
+    }
 
     private fun isSystemInDarkMode(): Boolean =
         (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
@@ -84,6 +115,9 @@ class ShellActivity : AppCompatActivity() {
     private fun applyImmersiveFullscreen(enabled: Boolean, hideNavBar: Boolean? = null, isDarkTheme: Boolean = isSystemInDarkMode()) {
         val shouldHideNavBar = hideNavBar ?: !showNavigationBarInFullscreen
         val systemDark = isSystemInDarkMode()
+        val effectiveColorMode = if (systemDark) statusBarColorModeDark else statusBarColorMode
+        val effectiveCustomColor = if (systemDark) statusBarCustomColorDark else statusBarCustomColor
+        val resolved = resolveStatusBarColorMode(effectiveColorMode, effectiveCustomColor)
         WindowHelper.applyImmersiveFullscreen(
             activity = this,
             enabled = enabled,
@@ -91,8 +125,8 @@ class ShellActivity : AppCompatActivity() {
             isDarkTheme = isDarkTheme,
             showStatusBar = showStatusBarInFullscreen,
             forceHideSystemUi = forceHideSystemUi,
-            statusBarColorMode = if (systemDark) statusBarColorModeDark else statusBarColorMode,
-            statusBarCustomColor = if (systemDark) statusBarCustomColorDark else statusBarCustomColor,
+            statusBarColorMode = resolved.first,
+            statusBarCustomColor = resolved.second,
             statusBarDarkIcons = if (systemDark) statusBarDarkIconsDark else statusBarDarkIcons,
             statusBarBgType = if (systemDark) statusBarBackgroundTypeDark else statusBarBackgroundType,
             keyboardAdjustMode = keyboardAdjustMode,
@@ -408,7 +442,18 @@ class ShellActivity : AppCompatActivity() {
 
                 val systemDark = isSystemInDarkMode()
 
-                LaunchedEffect(systemDark, statusBarColorMode, statusBarColorModeDark) {
+                LaunchedEffect(
+                    systemDark,
+                    statusBarColorMode,
+                    statusBarCustomColor,
+                    statusBarDarkIcons,
+                    statusBarBackgroundAlpha,
+                    statusBarColorModeDark,
+                    statusBarCustomColorDark,
+                    statusBarDarkIconsDark,
+                    statusBarBackgroundAlphaDark,
+                    statusBarAutoColor
+                ) {
                     if (!immersiveFullscreenEnabled) {
                         val effectiveColorMode = if (systemDark) statusBarColorModeDark else statusBarColorMode
                         val effectiveCustomColor = if (systemDark) statusBarCustomColorDark else statusBarCustomColor
@@ -442,7 +487,17 @@ class ShellActivity : AppCompatActivity() {
                             translateBridge = TranslateBridge(wv, lifecycleScope)
                             wv.addJavascriptInterface(translateBridge!!, TranslateBridge.JS_INTERFACE_NAME)
 
-                            val downloadBridge = com.webtoapp.core.webview.DownloadBridge(this@ShellActivity, lifecycleScope)
+                            val downloadLocationMode = try {
+                                com.webtoapp.data.model.DownloadLocationMode.valueOf(config.webViewConfig.downloadLocationMode)
+                            } catch (e: Exception) {
+                                com.webtoapp.data.model.DownloadLocationMode.SYSTEM_DOWNLOAD
+                            }
+                            val downloadBridge = com.webtoapp.core.webview.DownloadBridge(
+                                this@ShellActivity,
+                                lifecycleScope,
+                                downloadLocationMode,
+                                config.webViewConfig.customDownloadDirUri
+                            )
                             wv.addJavascriptInterface(downloadBridge, com.webtoapp.core.webview.DownloadBridge.JS_INTERFACE_NAME)
 
                             if (config.webViewConfig.enablePrintBridge) {
@@ -493,14 +548,31 @@ class ShellActivity : AppCompatActivity() {
                                     scope = lifecycleScope,
                                     webViewProvider = { wv },
                                     capabilities = capabilities,
-                                    corsBypass = config.webViewConfig.enableCorsBypass
+                                    corsBypass = config.webViewConfig.enableCorsBypass,
+                                    downloadLocationMode = downloadLocationMode,
+                                    customDownloadDirUri = config.webViewConfig.customDownloadDirUri
                                 )
                                 wv.addJavascriptInterface(nativeBridge, com.webtoapp.core.webview.NativeBridge.JS_INTERFACE_NAME)
+                            } else if (config.webViewConfig.enablePrivateNetworkBridge || config.webViewConfig.enableCorsBypass) {
+                                val privateNetworkBridge = com.webtoapp.core.webview.PrivateNetworkNativeBridgeAdapter(
+                                    context = this@ShellActivity,
+                                    scope = lifecycleScope,
+                                    webViewProvider = { wv },
+                                    corsBypass = config.webViewConfig.enableCorsBypass
+                                )
+                                wv.addJavascriptInterface(privateNetworkBridge, com.webtoapp.core.webview.NativeBridge.JS_INTERFACE_NAME)
+                            } else {
+                                wv.removeJavascriptInterface(com.webtoapp.core.webview.NativeBridge.JS_INTERFACE_NAME)
                             }
                             com.webtoapp.core.shell.ShellLogger.d("ShellActivity", "JS 桥接接口注册完成")
                         } catch (e: Exception) {
                             com.webtoapp.core.shell.ShellLogger.e("ShellActivity", "WebView 初始化失败", e)
                         }
+                    },
+                    onStatusBarAutoColorChanged = { color ->
+                        if (statusBarAutoColor == color) return@ShellScreen
+                        statusBarAutoColor = color
+                        refreshStatusBarAppearance()
                     },
                     onFileChooser = { callback, params ->
                         permissionDelegate.handleFileChooser(callback, params)

@@ -38,6 +38,16 @@ import javax.crypto.SecretKey
 import com.webtoapp.util.AppConstants
 import com.webtoapp.util.TextFileClassifier
 
+private fun resolveOutputDir(context: Context): File {
+    val external = context.getExternalFilesDir(null)
+    if (external != null) {
+        val dir = File(external, "built_apks")
+        if (dir.exists() || dir.mkdirs()) return dir
+        AppLogger.w("ApkBuilder", "External built_apks dir unavailable, falling back to filesDir")
+    }
+    return File(context.filesDir, "built_apks").apply { mkdirs() }
+}
+
 class ApkBuilder(private val context: Context) {
 
     companion object {
@@ -68,7 +78,7 @@ class ApkBuilder(private val context: Context) {
     private val encryptedApkBuilder = EncryptedApkBuilder(context)
     private val keyManager = KeyManager.getInstance(context)
 
-    private val outputDir = File(context.getExternalFilesDir(null), "built_apks").apply { mkdirs() }
+    private val outputDir = resolveOutputDir(context)
     private val tempDir = File(context.cacheDir, "apk_build_temp").apply { mkdirs() }
 
     private val originalAppName = "WebToApp"
@@ -1705,10 +1715,11 @@ builtins.__import__ = _w2a_import
         }
 
         val pythonHome = com.webtoapp.core.python.PythonDependencyManager.getPythonDir(context)
-        var pythonBinary312 = File(pythonHome, "bin/python3.12")
+        val versionedPythonBinaryName = com.webtoapp.core.python.PythonDependencyManager.getVersionedPythonBinaryName()
+        var pythonBinaryVersioned = File(pythonHome, "bin/$versionedPythonBinaryName")
         var pythonBinary3 = File(pythonHome, "bin/python3")
         var pythonBinary = when {
-            pythonBinary312.exists() && pythonBinary312.length() > 1024 * 1024 -> pythonBinary312
+            pythonBinaryVersioned.exists() && pythonBinaryVersioned.length() > 1024 * 1024 -> pythonBinaryVersioned
             pythonBinary3.exists() && pythonBinary3.length() > 1024 * 1024 -> pythonBinary3
             else -> null
         }
@@ -1722,10 +1733,10 @@ builtins.__import__ = _w2a_import
                 if (downloadSuccess) {
                     logger.log("Python runtime downloaded successfully")
 
-                    pythonBinary312 = File(pythonHome, "bin/python3.12")
+                    pythonBinaryVersioned = File(pythonHome, "bin/$versionedPythonBinaryName")
                     pythonBinary3 = File(pythonHome, "bin/python3")
                     pythonBinary = when {
-                        pythonBinary312.exists() && pythonBinary312.length() > 1024 * 1024 -> pythonBinary312
+                        pythonBinaryVersioned.exists() && pythonBinaryVersioned.length() > 1024 * 1024 -> pythonBinaryVersioned
                         pythonBinary3.exists() && pythonBinary3.length() > 1024 * 1024 -> pythonBinary3
                         else -> null
                     }
@@ -1751,7 +1762,7 @@ builtins.__import__ = _w2a_import
             }
         } else {
             logger.error("⚠️ CRITICAL: Python binary not available! The exported APK will NOT be able to run Python apps. Please ensure Python runtime is downloaded in WebToApp settings.")
-            logger.warn("Python binary not found or too small: python3.12=${pythonBinary312.let { "${it.exists()}/${it.length()}" }}, python3=${pythonBinary3.let { "${it.exists()}/${it.length()}" }}")
+            logger.warn("Python binary not found or too small: ${versionedPythonBinaryName}=${pythonBinaryVersioned.let { "${it.exists()}/${it.length()}" }}, python3=${pythonBinary3.let { "${it.exists()}/${it.length()}" }}")
         }
 
         val muslLinkerName = com.webtoapp.core.python.PythonDependencyManager.getMuslLinkerName(abi)
@@ -2587,7 +2598,7 @@ builtins.__import__ = _w2a_import
         if (rp.readExternalStorage) {
             permissions += "android.permission.READ_EXTERNAL_STORAGE"
         }
-        if (rp.writeExternalStorage) {
+        if (rp.writeExternalStorage || (config.downloadEnabled && config.downloadLocationMode != "APP_PRIVATE")) {
             permissions += "android.permission.WRITE_EXTERNAL_STORAGE"
         }
         if (rp.readMediaImages) {
@@ -2903,7 +2914,15 @@ builtins.__import__ = _w2a_import
     }
 
     fun getLogDirectory(): String {
-        return File(context.getExternalFilesDir(null), "build_logs").absolutePath
+        val external = context.getExternalFilesDir(null)
+        val dir = if (external != null) {
+            val d = File(external, "build_logs")
+            if (d.exists() || d.mkdirs()) d else File(context.filesDir, "build_logs")
+        } else {
+            File(context.filesDir, "build_logs")
+        }
+        dir.mkdirs()
+        return dir.absolutePath
     }
 }
 
@@ -3061,7 +3080,7 @@ private fun WebApp.buildActivationBlock(): ActivationBlock = ActivationBlock(
 )
 
 private fun WebApp.buildAdBlockBlock(): AdBlockBlock = AdBlockBlock(
-    enabled = adBlockEnabled,
+    enabled = adBlockSubscriptions.isNotEmpty() || adBlockRules.isNotEmpty(),
     rules = adBlockRules,
     subscriptions = adBlockSubscriptions
 )
@@ -3074,8 +3093,6 @@ private fun WebApp.buildAnnouncementBlock(): AnnouncementBlock = AnnouncementBlo
     link = announcement?.linkUrl ?: "",
     linkText = announcement?.linkText ?: "",
     template = announcement?.template?.toUiTemplate()?.type?.name ?: AnnouncementTemplateType.MINIMAL.name,
-    showEmoji = announcement?.showEmoji ?: true,
-    animationEnabled = announcement?.animationEnabled ?: true,
     showOnce = announcement?.showOnce ?: true,
     requireConfirmation = announcement?.requireConfirmation ?: false,
     allowNeverShow = announcement?.allowNeverShow ?: false,
@@ -3157,7 +3174,7 @@ private fun com.webtoapp.data.model.WebViewConfig.toWebViewBlock(context: androi
         injectScripts = resolvedInjectScripts,
         longPressMenuEnabled = longPressMenuEnabled,
         longPressMenuStyle = longPressMenuStyle.name,
-        adBlockToggleEnabled = adBlockToggleEnabled,
+
         popupBlockerEnabled = popupBlockerEnabled,
         popupBlockerToggleEnabled = popupBlockerToggleEnabled,
         openExternalLinks = openExternalLinks,
@@ -3168,7 +3185,10 @@ private fun com.webtoapp.data.model.WebViewConfig.toWebViewBlock(context: androi
         pwaOfflineEnabled = pwaOfflineEnabled && !clearBrowsingDataOnLaunch,
         pwaOfflineStrategy = pwaOfflineStrategy,
         keyboardAdjustMode = keyboardAdjustMode.name,
-        downloadEnabled = downloadEnabled
+        downloadEnabled = downloadEnabled,
+        downloadLocationMode = downloadLocationMode.name,
+        customDownloadDirUri = customDownloadDirUri,
+        antiCapture = antiCapture
     )
 }
 

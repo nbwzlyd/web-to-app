@@ -160,6 +160,7 @@ class MainViewModel(
         _currentApp.value = null
         _uiState.value = UiState.Idle
         _hasUnsavedChanges.value = false
+        _pwaAnalysisState.value = PwaAnalysisState.Idle
     }
 
     fun editApp(webApp: WebApp) {
@@ -167,6 +168,7 @@ class MainViewModel(
         _uiState.value = UiState.Idle
         _editState.value = webApp.toEditState()
         _hasUnsavedChanges.value = false
+        _pwaAnalysisState.value = PwaAnalysisState.Idle
 
         if (webApp.webViewConfig.injectScripts.any {
             com.webtoapp.core.script.UserScriptStorage.isFileReference(it.code)
@@ -1374,7 +1376,10 @@ class MainViewModel(
                     timeoutSeconds = timeoutSeconds
                 )
 
-                val result = scraper.scrape(config, onProgress)
+                val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
+                val result = scraper.scrape(config) { progress ->
+                    mainHandler.post { onProgress(progress) }
+                }
 
                 when (result) {
                     is com.webtoapp.core.scraper.WebsiteScraper.ScrapeResult.Success -> {
