@@ -1,37 +1,7 @@
 {
   "schema": 1,
-  "generatedAt": "2026-06-29T07:18:42Z",
+  "generatedAt": "2026-07-08T11:43:41Z",
   "submissions": {
-    "wta-auto-scroll": {
-      "submittedAt": "2026-05-23T15:28:53+08:00",
-      "direct": true,
-      "submitter": {
-        "login": "shiaho777",
-        "name": "shiaho",
-        "avatarUrl": "https://avatars.githubusercontent.com/u/222622008?v=4",
-        "profileUrl": "https://github.com/shiaho777"
-      }
-    },
-    "wta-hello-world": {
-      "submittedAt": "2026-05-16T01:13:57+08:00",
-      "direct": true,
-      "submitter": {
-        "login": "shiaho777",
-        "name": "shiaho",
-        "avatarUrl": "https://avatars.githubusercontent.com/u/222622008?v=4",
-        "profileUrl": "https://github.com/shiaho777"
-      }
-    },
-    "wta-reading-mode": {
-      "submittedAt": "2026-05-23T15:28:53+08:00",
-      "direct": true,
-      "submitter": {
-        "login": "shiaho777",
-        "name": "shiaho",
-        "avatarUrl": "https://avatars.githubusercontent.com/u/222622008?v=4",
-        "profileUrl": "https://github.com/shiaho777"
-      }
-    },
     "wta-selection-actions": {
       "submittedAt": "2026-06-17T21:43:16+08:00",
       "direct": true,
