@@ -1,3 +1,20 @@
+import java.util.Properties
+
+val localGradleConfig = Properties().apply {
+    val file = file("gradle/config.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+
+gradle.beforeProject {
+    localGradleConfig.forEach { (key, value) ->
+        if (findProperty(key.toString()) == null) {
+            extensions.extraProperties.set(key.toString(), value.toString())
+        }
+    }
+}
+
 pluginManagement {
     repositories {
         google()

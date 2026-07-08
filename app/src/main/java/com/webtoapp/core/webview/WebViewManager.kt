@@ -2708,6 +2708,15 @@ class WebViewManager(
         return !isLocalCleartextHost(host)
     }
 
+    private fun isWordPressAdminPage(pageUrl: String?): Boolean {
+        val url = pageUrl?.takeIf { it.isNotBlank() } ?: return false
+        val uri = runCatching { Uri.parse(url) }.getOrNull() ?: return false
+        val scheme = uri.scheme?.lowercase() ?: return false
+        if (scheme != "http" && scheme != "https") return false
+        val path = uri.encodedPath?.lowercase() ?: return false
+        return path == "/wp-admin" || path.startsWith("/wp-admin/")
+    }
+
     private fun shouldMinimizeLocalRuntimeInjection(pageUrl: String?): Boolean {
         return isLocalRuntimeUrl(pageUrl)
     }
@@ -4556,6 +4565,89 @@ class WebViewManager(
                         window.__webtoapp_popup_blocker_stats__ = function() {
                             return { blocked: blockedCount, enabled: window.__webtoapp_popup_blocker_enabled__ };
                         };
+                    })();
+                """.trimIndent())
+            }
+
+            if (isWordPressAdminPage(pageUrl)) {
+                scripts.add("""
+                    // WordPress 7 admin view transitions can leave Android WebView
+                    // on a blank screen after background/resume. Disable the admin
+                    // navigation transition and swallow the known AbortError.
+                    (function() {
+                        'use strict';
+                        if (window.__wta_wp_admin_transition_fix__) return;
+                        window.__wta_wp_admin_transition_fix__ = true;
+
+                        function isSkippedTransitionError(err) {
+                            try {
+                                var name = err && err.name ? String(err.name) : '';
+                                var message = err && err.message ? String(err.message) : String(err || '');
+                                return name === 'AbortError' || message.indexOf('Transition was skipped') !== -1;
+                            } catch (_) {
+                                return false;
+                            }
+                        }
+
+                        function swallowSkippedTransition(err) {
+                            if (isSkippedTransitionError(err)) return;
+                            throw err;
+                        }
+
+                        try {
+                            window.addEventListener('unhandledrejection', function(event) {
+                                if (event && isSkippedTransitionError(event.reason)) {
+                                    event.preventDefault();
+                                }
+                            });
+                        } catch (_) {}
+
+                        try {
+                            var style = document.createElement('style');
+                            style.setAttribute('data-wta', 'wp-admin-view-transition-fix');
+                            style.textContent =
+                                '@view-transition{navigation:none!important;}' +
+                                '#adminmenu>.menu-top{view-transition-name:none!important;}' +
+                                '::view-transition-old(root),::view-transition-new(root){animation:none!important;}';
+                            (document.head || document.documentElement).appendChild(style);
+                        } catch (_) {}
+
+                        try {
+                            if (document && typeof document.startViewTransition === 'function' &&
+                                !document.__wta_wp_admin_transition_patched__) {
+                                document.__wta_wp_admin_transition_patched__ = true;
+                                var originalStartViewTransition = document.startViewTransition.bind(document);
+                                document.startViewTransition = function(updateCallback) {
+                                    var transition;
+                                    try {
+                                        transition = originalStartViewTransition(updateCallback);
+                                    } catch (err) {
+                                        if (typeof updateCallback === 'function') {
+                                            try { updateCallback(); } catch (_) {}
+                                        }
+                                        return {
+                                            ready: Promise.resolve(),
+                                            finished: Promise.resolve(),
+                                            updateCallbackDone: Promise.resolve(),
+                                            skipTransition: function() {}
+                                        };
+                                    }
+
+                                    if (transition) {
+                                        if (transition.ready && typeof transition.ready.then === 'function') {
+                                            transition.ready = transition.ready.catch(swallowSkippedTransition);
+                                        }
+                                        if (transition.finished && typeof transition.finished.then === 'function') {
+                                            transition.finished = transition.finished.catch(swallowSkippedTransition);
+                                        }
+                                        if (transition.updateCallbackDone && typeof transition.updateCallbackDone.then === 'function') {
+                                            transition.updateCallbackDone = transition.updateCallbackDone.catch(swallowSkippedTransition);
+                                        }
+                                    }
+                                    return transition;
+                                };
+                            }
+                        } catch (_) {}
                     })();
                 """.trimIndent())
             }
