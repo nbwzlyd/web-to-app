@@ -2,6 +2,7 @@ package com.webtoapp.ui.webview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.webtoapp.ui.components.PremiumButton
 import com.webtoapp.ui.components.AutoRefreshCountdownChip
+import com.webtoapp.ui.components.WebViewLoadingBar
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -200,12 +201,15 @@ class WebViewActivity : AppCompatActivity() {
         val effectiveColorMode = if (isDarkTheme) statusBarColorModeDark else statusBarColorMode
         val effectiveCustomColor = if (isDarkTheme) statusBarCustomColorDark else statusBarCustomColor
         val resolved = resolveStatusBarColor(effectiveColorMode, effectiveCustomColor)
+        // 全屏（customView）期间强制隐藏系统栏，防止下面的 showStatusBar 配置又把系统栏画回来
+        val shouldForceHideSystemUi = customView != null
         WindowHelper.applyImmersiveFullscreen(
             activity = this,
             enabled = enabled,
             hideNavBar = shouldHideNavBar,
             isDarkTheme = isDarkTheme,
             showStatusBar = showStatusBarInFullscreen,
+            forceHideSystemUi = shouldForceHideSystemUi,
             statusBarColorMode = resolved.mode,
             statusBarCustomColor = resolved.color,
             statusBarDarkIcons = if (isDarkTheme) statusBarDarkIconsDark else statusBarDarkIcons,
@@ -2110,6 +2114,7 @@ fun WebViewScreen(
 
                 if (url == "about:blank") return
                 isLoading = true
+                loadProgress = 0
                 currentUrl = url ?: ""
                 errorMessage = null
                 jsScrollTop.set(0)
@@ -2714,16 +2719,11 @@ fun WebViewScreen(
                 )
             }
 
-            AnimatedVisibility(
+            WebViewLoadingBar(
                 visible = isLoading,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                LinearProgressIndicator(
-                    progress = { loadProgress / 100f },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+                progress = loadProgress / 100f,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
 
             if (!isActivationChecked && webApp?.activationEnabled == true) {
                 Box(

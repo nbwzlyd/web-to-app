@@ -395,6 +395,20 @@ object WindowHelper {
         view: View
     ): Int {
         val originalOrientation = activity.requestedOrientation
+        val restoreOrientation = resolveFullscreenRestoreOrientation(activity, originalOrientation)
+
+        // 网页通过 HTML5 Fullscreen API 进入全屏（视频/游戏/沉浸式内容）时，
+        // 现代 WebView 不一定把 SurfaceView/TextureView 暴露给 onShowCustomView
+        // （视频常通过 GL 渲染到 WebView 自身的 surface），仅依赖类型探测会
+        // 导致竖屏页面进入全屏后无法横屏。这里改为：若当前不在横屏家族中，
+        // 统一切到 SENSOR_LANDSCAPE，退出全屏时再恢复原方向，这是 Chrome
+        // 等浏览器的通用做法。
+        if (!isLandscapeOrientation(originalOrientation)) {
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            AppLogger.d("WindowHelper", "Fullscreen: switching to SENSOR_LANDSCAPE (was $originalOrientation, restore=$restoreOrientation)")
+        } else {
+            AppLogger.d("WindowHelper", "Fullscreen: already landscape, keep orientation ($originalOrientation, restore=$restoreOrientation)")
+        }
 
         val decorView = activity.window.decorView as FrameLayout
         decorView.addView(
@@ -404,7 +418,53 @@ object WindowHelper {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         )
-        return originalOrientation
+
+        // 网页 H5 Fullscreen 应该是真沉浸：忽略「全屏仍显示状态栏/导航栏」
+        // 等用户配置，强制隐藏所有系统栏。退出全屏时由 Activity 重新调用
+        // applyImmersiveFullscreen 恢复到用户原配置。
+        try {
+            WindowCompat.setDecorFitsSystemWindows(activity.window, false)
+            WindowInsetsControllerCompat(activity.window, decorView).apply {
+                hide(WindowInsetsCompat.Type.systemBars())
+                systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+            activity.window.statusBarColor = android.graphics.Color.TRANSPARENT
+            activity.window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        } catch (e: Exception) {
+            AppLogger.w("WindowHelper", "Failed to hide system bars for fullscreen", e)
+        }
+        return restoreOrientation
+    }
+
+    private fun resolveFullscreenRestoreOrientation(activity: Activity, requestedOrientation: Int): Int {
+        if (isFixedOrientation(requestedOrientation)) {
+            return requestedOrientation
+        }
+
+        return when (activity.resources.configuration.orientation) {
+            android.content.res.Configuration.ORIENTATION_LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            android.content.res.Configuration.ORIENTATION_PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            else -> requestedOrientation
+        }
+    }
+
+    private fun isFixedOrientation(orientation: Int): Boolean {
+        return orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
+    }
+
+    private fun isLandscapeOrientation(orientation: Int): Boolean {
+        return orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
+            orientation == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
     }
 
     private const val FULLSCREEN_VIDEO_DETECT_JS = """

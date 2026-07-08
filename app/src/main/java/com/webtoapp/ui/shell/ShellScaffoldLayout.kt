@@ -2,6 +2,7 @@ package com.webtoapp.ui.shell
 
 import android.webkit.WebView
 import com.webtoapp.ui.components.PremiumButton
+import com.webtoapp.ui.components.WebViewLoadingBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -16,8 +17,6 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -158,7 +157,6 @@ fun BoxScope.ShellScaffoldLayout(
                 visible = isLoading,
                 progress = loadProgress / 100f,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .align(Alignment.TopCenter)
             )
 
@@ -391,40 +389,6 @@ private fun ShellContentArea(
             onWebViewCreated = onWebViewCreated,
             onWebViewRefUpdated = onWebViewRefUpdated,
             onActivityFinish = onActivityFinish
-        )
-    }
-}
-
-@Composable
-private fun WebViewLoadingBar(
-    visible: Boolean,
-    progress: Float,
-    modifier: Modifier = Modifier
-) {
-    val animatedProgress by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = if (visible) progress.coerceIn(0f, 1f) else 1f,
-        animationSpec = com.webtoapp.ui.design.WtaMotion.settleSpring(),
-        label = "webviewProgress"
-    )
-    val alpha by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = com.webtoapp.ui.design.WtaMotion.exitTween(
-            durationMillis = com.webtoapp.ui.design.WtaMotion.DurationMedium
-        ),
-        label = "webviewProgressAlpha"
-    )
-    if (alpha <= 0f) return
-
-    val primary = MaterialTheme.colorScheme.primary
-    androidx.compose.foundation.Canvas(
-        modifier = modifier
-            .height(2.dp)
-            .graphicsLayer { this.alpha = alpha }
-    ) {
-        val fillWidth = size.width * animatedProgress
-        drawRect(
-            color = primary,
-            size = Size(fillWidth, size.height)
         )
     }
 }

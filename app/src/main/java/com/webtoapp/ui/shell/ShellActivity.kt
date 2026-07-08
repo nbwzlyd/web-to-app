@@ -118,13 +118,15 @@ class ShellActivity : AppCompatActivity() {
         val effectiveColorMode = if (systemDark) statusBarColorModeDark else statusBarColorMode
         val effectiveCustomColor = if (systemDark) statusBarCustomColorDark else statusBarCustomColor
         val resolved = resolveStatusBarColorMode(effectiveColorMode, effectiveCustomColor)
+        // 全屏（customView）期间强制隐藏系统栏，防止下面的 showStatusBar 配置又把系统栏画回来
+        val shouldForceHideSystemUi = forceHideSystemUi || customView != null
         WindowHelper.applyImmersiveFullscreen(
             activity = this,
             enabled = enabled,
             hideNavBar = shouldHideNavBar,
             isDarkTheme = isDarkTheme,
             showStatusBar = showStatusBarInFullscreen,
-            forceHideSystemUi = forceHideSystemUi,
+            forceHideSystemUi = shouldForceHideSystemUi,
             statusBarColorMode = resolved.first,
             statusBarCustomColor = resolved.second,
             statusBarDarkIcons = if (systemDark) statusBarDarkIconsDark else statusBarDarkIcons,
